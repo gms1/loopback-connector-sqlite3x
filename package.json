@@ -61,15 +61,15 @@
   },
   "dependencies": {
     "debug": "^3.1.0",
-    "loopback-connector": "4.5.0",
-    "sqlite3orm": "1.0.0",
-    "strong-globalize": "^4.1.1"
+    "loopback-connector": "^4.5.0",
+    "sqlite3orm": "^1.0.0",
+    "strong-globalize": "^4.1.0"
   },
   "devDependencies": {
-    "@types/debug": "0.0.30",
+    "@types/debug": "^0.0.30",
     "@types/mocha": "^5.2.4",
     "@types/node": "^10.3.5",
-    "@types/rc": "0.0.1",
+    "@types/rc": "^0.0.1",
     "@types/should": "^13.0.0",
     "@types/sinon": "^5.0.1",
     "@types/sqlite3": "^3.1.3",

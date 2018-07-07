@@ -1,8 +1,9 @@
 import * as path from 'path';
 import * as process from 'process';
 
-import {readPackageJson, writePackageJson} from './utils/package-json';
+import {copyDirSync} from './utils/copy-dir';
 import {copyFileSync} from './utils/copy-file';
+import {readPackageJson, writePackageJson} from './utils/package-json';
 
 /*
   prepare package.json for publishing
@@ -22,5 +23,9 @@ pkgJson = writePackageJson('dist/package.json', pkgJson);
 copyFileSync('README.md', 'dist/README.md');
 copyFileSync('LICENSE', 'dist/LICENSE');
 copyFileSync('.npmignore', 'dist/.npmignore');
+copyDirSync('src/intl', 'dist/intl');
 
-console.log(`prepare publishing for 'package.json' => ${pkgJson.name}@${pkgJson.version} succeed`);
+console.log(
+    `prepare publishing for 'package.json' => ${pkgJson.name}@${
+                                                                pkgJson.version
+                                                              } succeed`);
