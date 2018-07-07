@@ -10,7 +10,7 @@
 [![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
 [![Greenkeeper badge](https://badges.greenkeeper.io/gms1/loopback-connector-sqlite3x.svg)](https://greenkeeper.io/)
 
-**loopback-connector-sqlite3x** alternative LoopBack connector for sqlite3.
+**loopback-connector-sqlite3x** alternative LoopBack connector for SQLite3.
 
 ## Features
 
