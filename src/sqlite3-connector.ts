@@ -6,6 +6,7 @@ import * as _dbg from 'debug';
 //  => not a runtime dependency
 // tslint:disable-next-line no-implicit-dependencies
 import {Callback, DataSource} from 'loopback-datasource-juggler';
+import _sg = require('strong-globalize');
 /*
  * SQLite3 connector for LoopBack
  */
@@ -14,9 +15,12 @@ import {SQL_MEMORY_DB_SHARED, SQL_OPEN_DEFAULT, SqlDatabase} from 'sqlite3orm/Sq
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
 import {promisify} from './utils';
 
+const g = new _sg();
 const debug = _dbg('loopback:connector:sqlite3x:connector');
 
 const SQLITE3_CONNECTOR_NAME = 'sqlite3x';
+const SQLITE3_CONNECTOR_DESCRIPTION =
+    g.f('unofficial SQLite3 connector for LoopBack');
 
 // TODO: type for SQLConnector is missing
 export class Sqlite3Connector extends loopbackConnector.SQLConnector {
@@ -32,7 +36,9 @@ export class Sqlite3Connector extends loopbackConnector.SQLConnector {
     super(SQLITE3_CONNECTOR_NAME, settings);
     this._sqldb = new SqlDatabase();
     if (this.settings.debug) {
-      debug(`${SQLITE3_CONNECTOR_NAME} settings: %j`, this.settings);
+      debug(`${SQLITE3_CONNECTOR_NAME}`);
+      debug(`  ${SQLITE3_CONNECTOR_DESCRIPTION}`);
+      debug(`  settings: %j`, this.settings);
       SqlDatabase.verbose();
     }
   }

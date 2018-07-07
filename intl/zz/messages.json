@@ -1,0 +1,8 @@
+{
+  "5792f76283d3b1ebce38d3532f197c37": [
+    "g.f:dist/sqlite3-connector.js:15"
+  ],
+  "loopback:connector:sqlite3x:connector": [
+    "_dbg:dist/sqlite3-connector.js:13"
+  ]
+}

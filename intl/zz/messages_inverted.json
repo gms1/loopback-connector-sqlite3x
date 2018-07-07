@@ -1,0 +1,10 @@
+{
+  "dist/sqlite3-connector.js": {
+    "13": [
+      "_dbg('loopback:connector:sqlite3x:connector')"
+    ],
+    "15": [
+      "g.f('5792f76283d3b1ebce38d3532f197c37')"
+    ]
+  }
+}
