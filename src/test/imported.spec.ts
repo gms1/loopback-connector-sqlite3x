@@ -1,9 +1,9 @@
 // tslint:disable no-implicit-dependencies no-require-imports
-import {init} from './init';
+import {testInit} from './test-init';
 
 describe('imported tests', () => {
   before(() => {
-    init();
+    testInit();
   });
 
   // require('loopback-datasource-juggler/test/common.batch.js');

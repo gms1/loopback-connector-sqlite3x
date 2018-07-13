@@ -16,5 +16,19 @@ declare module 'loopback-connector' {
 
   export class SQLConnector extends Connector {
     constructor(name: string, settings?: any);
-  };
+
+    executeSQL(
+        sql: string, params?: any[], options?: object, callback?: Callback);
+
+    serializeObject(val: any): string;
+  }
+
+  export class Transaction {
+    connection: any;
+    static begin(connector: SQLConnector, callback: Callback): void;
+    commit(callback: Callback): void;
+    rollback(callback: Callback): void;
+  }
+
+  export class ParameterizedSQL { merge(sql: string): ParameterizedSQL; }
 }
