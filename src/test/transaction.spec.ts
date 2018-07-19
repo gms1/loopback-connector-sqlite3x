@@ -7,7 +7,7 @@ import * as should from 'should';
 
 import * as ConnectorModule from '..';
 import {Sqlite3Connector} from '../sqlite3-connector';
-import {SqlDatabase} from '../../../node-sqlite3-orm/dist';
+import {SqlDatabase} from 'sqlite3orm';
 import {AsyncResource} from 'async_hooks';
 
 

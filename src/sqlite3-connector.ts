@@ -10,7 +10,7 @@ import _sg = require('strong-globalize');
 /*
  * SQLite3 connector for LoopBack
  */
-import {SqlDatabase, SqlConnectionPool, SqlRunResult, SQL_OPEN_DEFAULT, SQL_MEMORY_DB_SHARED} from '../../node-sqlite3-orm/dist';
+import {SqlDatabase, SqlConnectionPool, SqlRunResult, SQL_OPEN_DEFAULT, SQL_MEMORY_DB_SHARED} from 'sqlite3orm';
 
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
 import {Sqlite3ExecuteOptions, Sqlite3PropertyOptions} from './sqlite3-options';
