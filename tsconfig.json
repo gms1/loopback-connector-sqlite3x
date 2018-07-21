@@ -24,8 +24,7 @@
     ],
     "types": [
       "node",
-      "mocha",
-      "loopback-connector"
+      "mocha"
     ]
   },
   "include": [

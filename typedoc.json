@@ -2,7 +2,6 @@
   "mode": "modules",
   "excludeExternals": true,
   "excludeNotExported": true,
-  "excludePrivate": true, 
-  "ignoreCompilerErrors": true,
-  "tsconfig": "tsconfig.json"
+  "excludePrivate": true,
+  "ignoreCompilerErrors": true
 }

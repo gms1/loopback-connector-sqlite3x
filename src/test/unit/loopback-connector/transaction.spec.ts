@@ -1,67 +1,26 @@
-// tslint:disable no-require-imports
-import loopbackConnector = require('loopback-connector');
-
-// tslint:disable no-implicit-dependencies
+// tslint:disable no-require-imports no-implicit-dependencies
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
-
-import * as ConnectorModule from '..';
-import {Sqlite3Connector} from '../sqlite3-connector';
 import {SqlDatabase} from 'sqlite3orm';
-import {AsyncResource} from 'async_hooks';
+
+import {Sqlite3JugglerConnector} from '../../..';
+import {Transaction} from '../../../export-lc';
+
+import {initDataSource} from './test-init';
 
 
-describe('transaction', () => {
+describe('loopback-connector transaction', () => {
   let ds: DataSource;
-  let connector: Sqlite3Connector;
+  let connector: Sqlite3JugglerConnector;
   let connection: SqlDatabase;
-
-  function getTransaction(): Promise<loopbackConnector.Transaction> {
-    return new Promise((resolve, reject) => {
-      loopbackConnector.Transaction.begin(
-          connector, (err: Error, tx: loopbackConnector.Transaction) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(tx);
-            }
-          });
-    });
-  }
-
-  function commitTransaction(tx: loopbackConnector.Transaction): Promise<void> {
-    return new Promise((resolve, reject) => {
-      tx.commit((err: Error) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  function rollbackTransaction(tx: loopbackConnector.Transaction):
-      Promise<void> {
-    return new Promise((resolve, reject) => {
-      tx.rollback((err: Error) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-
 
   before(async () => {
     try {
-      ds = new DataSource(ConnectorModule as any, {debug: false});
-      connector = ds.connector as any as Sqlite3Connector;
+      ds = initDataSource();
+      should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+      connector = ds.connector as any as Sqlite3JugglerConnector;
       await ds.connect();
-      connection = await connector.getConnection();
+      connection = await connector.pool.get();
       await connection.exec(
           'CREATE TABLE TEST (id INTEGER NOT NULL PRIMARY KEY, col VARCHAR(50))');
     } catch (err) {
@@ -74,7 +33,7 @@ describe('transaction', () => {
       await connection.exec('DROP TABLE TEST');
       await connection.close();
       connection = undefined as any as SqlDatabase;
-      connector = undefined as any as Sqlite3Connector;
+      connector = undefined as any as Sqlite3JugglerConnector;
       await ds.disconnect();
       ds = undefined as any as DataSource;
     } catch (err) {
@@ -89,6 +48,43 @@ describe('transaction', () => {
       err.should.fail();
     }
   });
+
+
+  function getTransaction(): Promise<Transaction> {
+    return new Promise((resolve, reject) => {
+      Transaction.begin(connector, (err: Error, tx: Transaction) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(tx);
+        }
+      });
+    });
+  }
+
+  function commitTransaction(tx: Transaction): Promise<void> {
+    return new Promise((resolve, reject) => {
+      tx.commit((err: Error) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  function rollbackTransaction(tx: Transaction): Promise<void> {
+    return new Promise((resolve, reject) => {
+      tx.rollback((err: Error) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
 
   it('commit', async () => {
     try {

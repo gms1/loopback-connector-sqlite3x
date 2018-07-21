@@ -23,7 +23,6 @@ pkgJson = writePackageJson('dist/package.json', pkgJson);
 copyFileSync('README.md', 'dist/README.md');
 copyFileSync('LICENSE', 'dist/LICENSE');
 copyFileSync('.npmignore', 'dist/.npmignore');
-copyDirSync('src/intl', 'dist/intl');
 
 console.log(
     `prepare publishing for 'package.json' => ${pkgJson.name}@${

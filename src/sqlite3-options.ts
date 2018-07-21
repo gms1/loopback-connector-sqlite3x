@@ -10,4 +10,15 @@ export interface Sqlite3ExecuteOptions {
   transaction?: Sqlite3TransactionOptions;
 }
 
-export interface Sqlite3PropertyOptions { dbtype?: string; }
+export interface Sqlite3ModelOptions {
+  tableName?: string;
+  autoIncrement?: boolean;
+  withoutRowId?: boolean;
+}
+
+
+export interface Sqlite3PropertyOptions {
+  columnName?: string;
+  dbtype?: string;
+  isJson?: boolean;
+}

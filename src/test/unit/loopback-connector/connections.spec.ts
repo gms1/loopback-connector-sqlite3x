@@ -1,18 +1,18 @@
-// tslint:disable no-implicit-dependencies
+// tslint:disable no-require-imports no-implicit-dependencies
+// tslint:disable no-duplicate-imports
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 
-import * as ConnectorModule from '..';
-import {Sqlite3Connector} from '../sqlite3-connector';
-import {SQL_OPEN_READWRITE} from '../sqlite3-settings';
+import * as ConnectorModule from '../../..';
+import {SQL_OPEN_READWRITE, Sqlite3JugglerConnector} from '../../..';
 
 
-describe('connections', () => {
+describe('loopback-connector connections', () => {
 
   it('should connect using default settings', async () => {
     const ds = new DataSource(ConnectorModule as any);
-    should(ds.connector).be.instanceof (Sqlite3Connector);
-    const connector = ds.connector as any as Sqlite3Connector;
+    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+    const connector = ds.connector as Sqlite3JugglerConnector;
     ds.should.be.equal(connector.dataSource);
 
     await ds.connect();
@@ -24,18 +24,18 @@ describe('connections', () => {
     await connector.disconnect();  // to increase coverage
   });
 
-  it('connect should fail for not existing db file (lazyConnect and connect() having callback)',
+  it('should fail to connect to wrong db file (lazyConnect and connect() having callback)',
      async () => {
        const ds = new DataSource(
            ConnectorModule as any,
            {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
-       should(ds.connector).be.instanceof (Sqlite3Connector);
-       const connector = ds.connector as any as Sqlite3Connector;
+       should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+       const connector = (ds.connector as Sqlite3JugglerConnector);
        ds.should.be.equal(connector.dataSource);
 
        try {
          const p = new Promise((resolve, reject) => {
-           connector.connect((err) => {
+           connector.connect((err: any) => {
              if (err) {
                reject(err);
              } else {
@@ -65,13 +65,13 @@ describe('connections', () => {
      });
 
 
-  it('connect should fail for not existing db file (lazyConnect and connect() returning promise)',
+  it('should fail to connect to wrong db file (lazyConnect and connect() returning promise)',
      async () => {
        const ds = new DataSource(
            ConnectorModule as any,
            {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
-       should(ds.connector).be.instanceof (Sqlite3Connector);
-       const connector = ds.connector as any as Sqlite3Connector;
+       should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+       const connector = ds.connector as Sqlite3JugglerConnector;
        ds.should.be.equal(connector.dataSource);
 
        try {

@@ -19,8 +19,8 @@
 * connection pool
 * discovering models
 * auto migrate/auto update
-* full control over the names for tables, fields and foreign key constraints in the mapped database schema
 * decorators for advanced mapping of models written in TypeScript/JavaScript to a sqlite3 database schema
+* full control over the names for tables, fields and foreign key constraints in the mapped database schema
 
 ## Installation
 
@@ -43,7 +43,7 @@ see: [sqlite3orm](https://github.com/gms1/node-sqlite3-orm)
 
 ## License
 
-**loopback-connector-sqlite3x** is licensed under the MIT License:
+**loopback-connector-sqlite3x** is licensed under the Artistic License 2.0:
 [LICENSE](./LICENSE)
 
 ## Release Notes

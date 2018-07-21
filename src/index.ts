@@ -3,4 +3,6 @@ import sg = require('strong-globalize');
 sg.SetRootDir(__dirname);
 
 export * from './sqlite3-settings';
-export * from './sqlite3-connector';
+export * from './sqlite3-options';
+export * from './sqlite3-juggler-connector';
+export * from './sqlite3-crud-connector';
