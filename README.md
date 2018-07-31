@@ -5,7 +5,7 @@
 [![npm version](https://badge.fury.io/js/loopback-connector-sqlite3x.svg)](https://badge.fury.io/js/loopback-connector-sqlite3x)
 [![Known Vulnerabilities](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x/badge.svg)](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x)
 [![Build Status](https://api.travis-ci.org/gms1/loopback-connector-sqlite3x.svg?branch=master)](https://travis-ci.org/gms1/loopback-connector-sqlite3x)
-[![Coverage Status](https://img.shields.io/coveralls/github/gms1/loopback-connector-sqlite3x/master.svg)](https://coveralls.io/github/gms1/loopback-connector-sqlite3x?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/gms1/loopback-connector-sqlite3x/badge.svg?branch=master&service=github)](https://coveralls.io/github/gms1/loopback-connector-sqlite3x?branch=master)
 [![DeepScan Grade](https://deepscan.io/api/projects/742/branches/1407/badge/grade.svg)](https://deepscan.io/dashboard/#view=project&pid=742&bid=1407)
 [![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
 [![Greenkeeper badge](https://badges.greenkeeper.io/gms1/loopback-connector-sqlite3x.svg)](https://greenkeeper.io/)
@@ -14,13 +14,18 @@
 
 ## Features
 
-### TODO
+### DONE
 
+* auto migrate
 * connection pool
-* discovering models
-* auto migrate/auto update
 * decorators for advanced mapping of models written in TypeScript/JavaScript to a sqlite3 database schema
 * full control over the names for tables, fields and foreign key constraints in the mapped database schema
+
+### TODO
+
+* auto update
+* discovering models
+* LB4 CrudConnector ?
 
 ## Installation
 

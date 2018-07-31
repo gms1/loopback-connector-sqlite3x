@@ -21,7 +21,7 @@ delete pkgJson.devDependencies;
 pkgJson = writePackageJson('dist/package.json', pkgJson);
 
 copyFileSync('README.md', 'dist/README.md');
-copyFileSync('LICENSE', 'dist/LICENSE');
+copyFileSync('LICENSE.md', 'dist/LICENSE.md');
 copyFileSync('.npmignore', 'dist/.npmignore');
 
 console.log(

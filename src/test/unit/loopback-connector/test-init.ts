@@ -18,7 +18,14 @@ export function getDataSource(): DataSource {
   return glob.ds;
 }
 
+// TODO: evaluate if additional features can be supported:
 glob.connectorCapabilities = {
+  cloudantCompatible: false,
   ilike: false,
-  nilike: false
+  nilike: false,
+  supportForceId: false,
+  get geoPoint(): boolean {
+    return false;
+  },
+  set geoPoint(val: boolean) {}
 };

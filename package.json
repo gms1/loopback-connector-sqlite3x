@@ -34,10 +34,10 @@
     "prebuild": "build/sh/tsrun prebuild.ts",
     "build": "tsc -p tsconfig.json",
     "rebuild": "npm run clean && npm run build",
-    "test:run": "mocha -t 20000 -r ts-node/register 'src/**/*.ts'",
+    "test:run": "mocha -t 40000 -r ts-node/register 'src/**/*.ts'",
     "test": "npm run build && npm run test:run",
     "watch": "tsc -w -p tsconfig.json",
-    "coverage:run": "nyc -e .ts -n 'src/**/*' -x 'src/test/**/*' mocha -t 20000 -r ts-node/register 'src/**/*.ts'",
+    "coverage:run": "nyc -e .ts -n 'src/**/*' -x 'src/test/**/*' mocha -t 40000 -r ts-node/register 'src/**/*.ts'",
     "coverage:report": "nyc report --reporter=text-lcov",
     "coverage:html": "nyc report --reporter=html",
     "coverage:coveralls": "nyc report --reporter=text-lcov | coveralls",
@@ -65,7 +65,7 @@
     "debug": "^3.1.0",
     "loopback-connector": "^4.5.1",
     "loopback-datasource-juggler": "^3.23.0",
-    "sqlite3orm": "file://../node-sqlite3-orm/dist",
+    "sqlite3orm": "^2.1.0",
     "strong-globalize": "^4.1.1"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-.PHONY: default test coverage
+.PHONY: default test coverage coverage_fast
 
 NODE_VERSION := $(shell node -v | awk -F. '{sub(/v/,""); print $$1}')
 
@@ -8,6 +8,12 @@ coverage:
 	-rm -rf coverage
 	npm run coverage:run
 	npm run coverage:html
+
+coverage_fast:
+	-rm -rf coverage
+	npm run coverage:run -- --grep imported --invert
+	npm run coverage:html
+
 
 test:
 	npm run clean

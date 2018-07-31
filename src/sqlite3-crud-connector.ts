@@ -1,10 +1,8 @@
 
 // tslint:disable no-require-imports member-ordering
-import {Class, CrudConnector, Entity, EntityData, Filter, Options, Where} from '@loopback/repository';
-import * as _dbg from 'debug';
-
+import {Class, Connector, CrudConnector, Entity, EntityData, Filter, Options, Where} from '@loopback/repository';
 import _sg = require('strong-globalize');
-
+import * as _dbg from 'debug';
 import {SqlConnectionPool, SqlDatabase, SqlRunResult, SQL_MEMORY_DB_SHARED, SQL_OPEN_DEFAULT} from 'sqlite3orm';
 
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
@@ -21,7 +19,7 @@ const debug = _dbg('loopback:connector:sqlite3x');
 // tslint:disable-next-line:no-any
 export type AnyIdType = any;
 
-export class Sqlite3CrudConnector implements CrudConnector {
+export class Sqlite3CrudConnector implements Connector /*, CrudConnector*/ {
   /*************************************************************************************
    * Connector interface
    */
@@ -33,7 +31,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    */
 
   settings!: Sqlite3AllSettings;
+
   readonly pool: SqlConnectionPool;
+
+  private execCounter: number;
 
   /* istanbul ignore next */
   static get debugEnabled(): boolean {
@@ -55,6 +56,7 @@ export class Sqlite3CrudConnector implements CrudConnector {
     }
     this.settings = Sqlite3CrudConnector.enrichInputSettings(settings || {});
     this.pool = new SqlConnectionPool();
+    this.execCounter = 0;
   }
 
   /* istanbul ignore next */
@@ -130,10 +132,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of the entity created
    */
-  create(modelClass: Class<Entity>, entity: EntityData, options: Options):
-      Promise<EntityData> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  // create(modelClass: Class<Entity>, entity: EntityData, options: Options):
+  //       Promise<EntityData> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
 
   /**
    * Create multiple entities
@@ -142,11 +144,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of an array of entities created
    */
-  createAll(
-      modelClass: Class<Entity>, entities: EntityData[],
-      options?: Options): Promise<EntityData[]> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   createAll(
+  //       modelClass: Class<Entity>, entities: EntityData[],
+  //       options?: Options): Promise<EntityData[]> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
 
   /**
    * Save an entity
@@ -155,10 +157,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of the entity saved
    */
-  save(modelClass: Class<Entity>, entity: EntityData, options?: Options):
-      Promise<EntityData> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   save(modelClass: Class<Entity>, entity: EntityData, options?: Options):
+  //       Promise<EntityData> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Find matching entities by the filter
    * @param modelClass The model class
@@ -166,10 +168,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of an array of entities found for the filter
    */
-  find(modelClass: Class<Entity>, filter?: Filter, options?: Options):
-      Promise<EntityData[]> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   find(modelClass: Class<Entity>, filter?: Filter, options?: Options):
+  //       Promise<EntityData[]> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Find an entity by id
    * @param modelClass The model class
@@ -177,10 +179,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of the entity found for the id
    */
-  findById<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
-      Promise<EntityData> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   findById<IdType>(modelClass: Class<Entity>, id: IdType, options?:
+  //   Options):
+  //       Promise<EntityData> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Update an entity
    * @param modelClass The model class
@@ -189,10 +192,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @returns Promise<true> if an entity is updated, otherwise
    * Promise<false>
    */
-  update(modelClass: Class<Entity>, entity: EntityData, options?: Options):
-      Promise<boolean> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   update(modelClass: Class<Entity>, entity: EntityData, options?: Options):
+  //       Promise<boolean> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Delete an entity
    * @param modelClass The model class
@@ -201,10 +204,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @returns Promise<true> if an entity is deleted, otherwise
    * Promise<false>
    */
-  delete(modelClass: Class<Entity>, entity: EntityData, options?: Options):
-      Promise<boolean> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   delete(modelClass: Class<Entity>, entity: EntityData, options?: Options):
+  //       Promise<boolean> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Update matching entities
    * @param modelClass The model class
@@ -213,11 +216,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of number of matching entities deleted
    */
-  updateAll(
-      modelClass: Class<Entity>, data: EntityData, where?: Where,
-      options?: Options): Promise<number> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   updateAll(
+  //       modelClass: Class<Entity>, data: EntityData, where?: Where,
+  //       options?: Options): Promise<number> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Update an entity by id
    * @param modelClass The model class
@@ -227,11 +230,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @returns Promise<true> if an entity is updated for the id, otherwise
    * Promise<false>
    */
-  updateById<IdType>(
-      modelClass: Class<Entity>, id: IdType, data: EntityData,
-      options?: Options): Promise<boolean> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   updateById<IdType>(
+  //       modelClass: Class<Entity>, id: IdType, data: EntityData,
+  //       options?: Options): Promise<boolean> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Replace an entity by id
    * @param modelClass The model class
@@ -241,11 +244,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @returns Promise<true> if an entity is replaced for the id, otherwise
    * Promise<false>
    */
-  replaceById<IdType>(
-      modelClass: Class<Entity>, id: IdType, data: EntityData,
-      options?: Options): Promise<boolean> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   replaceById<IdType>(
+  //       modelClass: Class<Entity>, id: IdType, data: EntityData,
+  //       options?: Options): Promise<boolean> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Delete matching entities
    * @param modelClass The model class
@@ -253,10 +256,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of number of matching entities deleted
    */
-  deleteAll(modelClass: Class<Entity>, where?: Where, options?: Options):
-      Promise<number> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   deleteAll(modelClass: Class<Entity>, where?: Where, options?: Options):
+  //       Promise<number> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Delete an entity by id
    * @param modelClass The model class
@@ -265,10 +268,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @returns Promise<true> if an entity is deleted for the id, otherwise
    * Promise<false>
    */
-  deleteById<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
-      Promise<boolean> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   deleteById<IdType>(modelClass: Class<Entity>, id: IdType, options?:
+  //   Options):
+  //       Promise<boolean> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Count matching entities
    * @param modelClass The model class
@@ -276,10 +280,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @param options Options for the operation
    * @returns A promise of number of matching entities
    */
-  count(modelClass: Class<Entity>, where?: Where, options?: Options):
-      Promise<number> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   count(modelClass: Class<Entity>, where?: Where, options?: Options):
+  //       Promise<number> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
   /**
    * Check if an entity exists for the id
    * @param modelClass The model class
@@ -288,10 +292,10 @@ export class Sqlite3CrudConnector implements CrudConnector {
    * @returns Promise<true> if an entity exists for the id, otherwise
    * Promise<false>
    */
-  exists<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
-      Promise<boolean> {
-    throw new Error('TODO: Not implemented yet.');
-  }
+  //   exists<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
+  //       Promise<boolean> {
+  //     throw new Error('TODO: Not implemented yet.');
+  //   }
 
   /*************************************************************************************
    * helper functions
@@ -305,6 +309,7 @@ export class Sqlite3CrudConnector implements CrudConnector {
       return Promise.reject(new Error(g.f('no pool connected')));
     }
     try {
+      /* istanbul ignore if */
       if (this.pool.opening) {
         // waiting for pool to open
         await this.pool.opening;
@@ -333,7 +338,6 @@ export class Sqlite3CrudConnector implements CrudConnector {
   }
 
 
-  private execCounter: number = 0;
   /**
    * execute sql on new connection from pool
    * release connection afterwards
@@ -341,15 +345,11 @@ export class Sqlite3CrudConnector implements CrudConnector {
   async execSql(sql: string, params?: any[]): Promise<any[]|SqlRunResult> {
     let connection: SqlDatabase|undefined;
     let res: any[]|SqlRunResult;
-    const execCounter = ++this.execCounter;
     try {
       connection = await this.getConnection();
-      debug(`sql(${execCounter}): ${sql}`);
-      res = await Sqlite3CrudConnector.runSQL(connection, sql, params);
-      debug(`sql(${execCounter}): succeeded `);
+      res = await this.runSQL(connection, sql, params);
       // release connection to pool
     } catch (err) {
-      debug(`sql(${execCounter}): failed: `, err);
       if (connection) {
         try {
           await connection.close();
@@ -405,17 +405,45 @@ export class Sqlite3CrudConnector implements CrudConnector {
 
   static runDML(conn: SqlDatabase, sql: string, params?: any[]):
       Promise<SqlRunResult> {
-    return conn.run(sql, params);
+    return conn.run(sql, params).catch((err) => {
+      if (err && err.message.match(/UNIQUE constraint failed/i)) {
+        err.message = `DUPLICATE: ${err.message}`;
+      }
+      return Promise.reject(err);
+    });
   }
 
 
-  static runSQL(conn: SqlDatabase, sql: string, params?: any[]):
+  async runSQL(conn: SqlDatabase, sql: string, params?: any[]):
       Promise<any[]|SqlRunResult> {
-    const sqlType = sql.trimLeft().substring(0, 6).toUpperCase();
-    if (sqlType === 'SELECT' || sqlType === 'PRAGMA') {
-      return Sqlite3CrudConnector.runDQL(conn, sql, params);
-    } else {
-      return Sqlite3CrudConnector.runDML(conn, sql, params);
+    const execCounter = ++this.execCounter;
+    try {
+      let res: any[]|SqlRunResult;
+      debug(`sql(${execCounter}): ${sql}`);
+      if (Array.isArray(params) && params.length) {
+        debug(`sql(${execCounter}): params: `, params);
+      }
+      const sqlType = sql.trimLeft().substring(0, 6).toUpperCase();
+      if (sqlType === 'SELECT' || sqlType === 'PRAGMA') {
+        res = await Sqlite3CrudConnector.runDQL(conn, sql, params);
+        debug(`sql(${execCounter}): succeeded (records: ${res.length})`);
+        debug(
+            `sql(${execCounter}): result: `, JSON.stringify(res, undefined, 2));
+      } else {
+        res = await Sqlite3CrudConnector.runDML(conn, sql, params);
+        if (res.lastID) {
+          debug(
+              `sql(${execCounter}): succeeded (records: ${
+                                                          res.changes
+                                                        }, id: ${res.lastID})`);
+        } else {
+          debug(`sql(${execCounter}): succeeded (records: ${res.changes})`);
+        }
+      }
+      return Promise.resolve(res);
+    } catch (err) {
+      debug(`sql(${execCounter}): failed: `, err);
+      return Promise.reject(err);
     }
   }
 
@@ -431,18 +459,23 @@ export class Sqlite3CrudConnector implements CrudConnector {
         connectorSettings.poolMax == undefined ? 0 : connectorSettings.poolMax;
     connectorSettings.schemaName = connectorSettings.schemaName || 'main';
     connectorSettings.debug = Sqlite3CrudConnector.debugEnabled;
+    /* istanbul ignore else */
     if (!connectorSettings.dbSettings) {
       connectorSettings.dbSettings = {};
     }
+    /* istanbul ignore else */
     if (!connectorSettings.dbSettings.journalMode) {
       connectorSettings.dbSettings.journalMode = 'WAL';
     }
+    /* istanbul ignore else */
     if (!connectorSettings.dbSettings.busyTimeout) {
       connectorSettings.dbSettings.busyTimeout = 3000;
     }
+    /* istanbul ignore else */
     if (!connectorSettings.dbSettings.readUncommitted) {
       connectorSettings.dbSettings.readUncommitted = 'FALSE';
     }
+    /* istanbul ignore else */
     if (!connectorSettings.dbSettings.executionMode) {
       connectorSettings.dbSettings.executionMode = 'PARALLELIZE';
     }

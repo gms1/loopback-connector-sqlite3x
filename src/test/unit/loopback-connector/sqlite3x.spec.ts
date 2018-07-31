@@ -40,11 +40,14 @@ describe('loopback-datasource-juggler sqlite3x', () => {
 
   let spyExecuteSql: sinon.SinonSpy;
 
+  let escapedID: string;
+
   before(() => {
     ds = getDataSource();
     db = ds as any;
     should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
     connector = ds.connector as Sqlite3JugglerConnector;
+    escapedID = connector.escapeName('ID') as string;
     const models: any = db.modelBuilder.buildModels(schemas);
     Post = models[schemaName];
     Post.attachTo(db);
@@ -142,7 +145,7 @@ describe('loopback-datasource-juggler sqlite3x', () => {
          should.not.exists(err);
          spyExecuteSql.callCount.should.be.equal(1);
          spyExecuteSql.args[0][0].should.not.containEql('1+1');
-         spyExecuteSql.args[0][0].should.containEql(' "ID"=:1 ');
+         spyExecuteSql.args[0][0].should.containEql(` ${escapedID}=:1 `);
          done();
        });
      });
@@ -153,7 +156,7 @@ describe('loopback-datasource-juggler sqlite3x', () => {
       should.not.exists(err);
       spyExecuteSql.callCount.should.be.equal(1);
       spyExecuteSql.args[0][0].should.not.containEql('1+1');
-      spyExecuteSql.args[0][0].should.containEql(' "ID"=:1 ');
+      spyExecuteSql.args[0][0].should.containEql(` ${escapedID}=:1 `);
       done();
     });
   });
@@ -165,7 +168,7 @@ describe('loopback-datasource-juggler sqlite3x', () => {
          should.not.exists(err);
          spyExecuteSql.callCount.should.be.equal(1);
          spyExecuteSql.args[0][0].should.not.containEql('1+1');
-         spyExecuteSql.args[0][0].should.containEql(' "ID">:1 ');
+         spyExecuteSql.args[0][0].should.containEql(` ${escapedID}>:1 `);
          done();
        });
      });
@@ -185,7 +188,7 @@ describe('loopback-datasource-juggler sqlite3x', () => {
          should.not.exists(err);
          spyExecuteSql.callCount.should.be.equal(1);
          spyExecuteSql.args[0][0].should.not.containEql('1+1');
-         spyExecuteSql.args[0][0].should.containEql(' "ID" IN (:1) ');
+         spyExecuteSql.args[0][0].should.containEql(` ${escapedID} IN (:1) `);
          done();
        });
      });
