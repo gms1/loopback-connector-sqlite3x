@@ -4,8 +4,7 @@
 
 
 import {Callback, DataSource, Filter, PromiseOrVoid, PropertyDefinition, TransactionMixin} from 'loopback-datasource-juggler';
-
-import {FieldOpts, MetaModel, schema, SqlConnectionPool, SqlDatabase, SqlRunResult, Table, TableOpts} from 'sqlite3orm';
+import {AutoUpgrader, FieldOpts, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table, TableOpts} from 'sqlite3orm';
 
 import {ParameterizedSQL, SQLConnector} from './export-lc';
 import {SQLITE3_CONNECTOR_NAME, Sqlite3CrudConnector} from './sqlite3-crud-connector';
@@ -43,6 +42,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   // *************************************************************************************
   //  connect, disconnect, ping, ...
+  // -------------------------------------------------------------------------------------
 
   /**
    * connect to Sqlite3 database pool
@@ -73,6 +73,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   // *************************************************************************************
   //  Transactions
+  // -------------------------------------------------------------------------------------
 
   beginTransaction(isolationLevel: string, cb?: Callback): PromiseOrVoid;
   beginTransaction(cb?: Callback): PromiseOrVoid;
@@ -100,6 +101,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   // *************************************************************************************
   //  Execute sql
+  // -------------------------------------------------------------------------------------
 
   /**
    * Execute a SQL statement with given parameters
@@ -139,13 +141,43 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
         this.promisifiedExecuteSql(sql, params, options), cb);
   }
 
+  public async promisifiedExecuteSql(
+      sql: string, params?: any[],
+      options?: Sqlite3ExecuteOptions): Promise<any[]|SqlRunResult> {
+    params = params || [];
+    options = options || {};
+    let res: any[]|SqlRunResult;
+    try {
+      const transaction = options && options.transaction;
+      if (transaction && transaction.connection &&
+          transaction.connector === this) {
+        res = await this._crudConnector.runSQL(
+            transaction.connection, sql, params);
+      } else {
+        res = await this._crudConnector.execSql(sql, params);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    return Promise.resolve(res);
+  }
 
 
   getInsertedId(model: string, result?: SqlRunResult): number|undefined {
-    return result && result.lastID;  // TODO: do we always want to return the
-                                     // lastID or do we want to handle the
-                                     // primary key properly ?
+    // the 'result.lastID' is the last inserted RowId
+    const metaModel = this.getMetaModel(model);
+    if (result && metaModel.table.mapNameToIdentityField.size === 1) {
+      const fld = metaModel.table.mapNameToIdentityField.values().next();
+      if (fld.value.dbTypeInfo.typeAffinity === 'INTEGER') {
+        // Only if the primary key is integer, it is an alias for the RowId.
+        return result.lastID;
+      }
+    }
+    // result.lastID is not the "inserted ID"
+    return undefined;
   }
+
+
 
   getCountForAffectedRows(model: string, result?: SqlRunResult): number
       |undefined {
@@ -266,43 +298,6 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   // *************************************************************************************
   // Mapping:
   // -------------------------------------------------------------------------------------
-  //  Schema:
-  // -------------------------------------------------------------------------------------
-  //  this.schema(model) retrieves the schema name for a given model name
-  //    the corresponding model definition can have a connector specific
-  //    setting having the properties:
-  //      'schema' or 'schemaName'
-  //    a connector can have 'settings' having the properties
-  //      'schema' or 'schemaName'
-  //    a connector can implement getDefaultSchemaName()
-  //  Sqlite3 schema: one of 'main', 'temp' or the schema name of an attached
-  //  database Sqlite3Connector:
-  //    TODO: use the connector specific setting with the 'schemaName'
-  //    property default: the default schema can be specified by the
-  //    'schemaName' property in the settings or 'main' if not set
-
-  // -------------------------------------------------------------------------------------
-  //  Table:
-  // -------------------------------------------------------------------------------------
-  //  this.table(model) retrieves the table name for a given model name
-  //    the corresponding model definition can have a connector specific
-  //    setting having the properties:
-  //      'table' or 'tableName'
-  //  otherwise defaults to this.dbName(model) if this function exist or to
-  //  the given model name
-
-  // -------------------------------------------------------------------------------------
-  //  Column:
-  // -------------------------------------------------------------------------------------
-  //  this.column(model, property) retrieves the column name for a given model
-  //  and property name
-  //    the corresponding property definition can have a connector specific
-  //    setting having the properties:
-  //      'column' or 'columnName'
-  //  otherwise defaults to this.dbName(property) if this function exist or to
-  //  the given property name
-
-  // -------------------------------------------------------------------------------------
 
   /**
    * get the default table/column name for a given model/property name
@@ -334,13 +329,14 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   /**
    * escape a value
    * @param name The name
-   */
   escapeValue(value: any): any {
     return value;
   }
+   */
 
   // *************************************************************************************
   // pagination
+  // -------------------------------------------------------------------------------------
 
   static buildLimit(filter: Filter): string|undefined {
     const limit = filter.limit ? (isNaN(filter.limit) ? 0 : filter.limit) : 0;
@@ -368,7 +364,8 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   }
 
   // *************************************************************************************
-  // automigration
+  // automigration/autoupdate/isActual
+  // -------------------------------------------------------------------------------------
 
   /**
    * Create the table for the given model
@@ -378,7 +375,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   createTable(model: string, cb?: Callback): PromiseOrVoid {
     const fn = async(): Promise<void> => {
       try {
-        const metaModel = this.getMetaModel(model);
+        const metaModel = this.getMetaModel(model, true);
         await this.promisifiedExecuteSql(
             metaModel.table.getCreateTableStatement());
       } catch (err /* istanbul ignore next */) {
@@ -409,43 +406,111 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     return callbackifyOrPromise(fn(), cb);
   }
 
+
+  /**
+   * Perform autoupdate for the given models or all models
+   *
+   * @param [models] - The model name or array of model names
+   * @param [cb] - The callback function
+   */
+  autoupdate(models?: string|string[], cb?: Callback): PromiseOrVoid;
+  autoupdate(cb?: Callback): PromiseOrVoid;
+  autoupdate(models?: string|string[]|Callback, cb?: Callback): PromiseOrVoid {
+    if (!cb && typeof models === 'function') {
+      cb = models;
+      models = undefined;
+    }
+    if (models && typeof models === 'string') {
+      models = [models];
+    }
+    models = models || Object.keys((this as any)._models);
+    return this._autoupate(models as string[], cb);
+  }
+
+  protected _autoupate(models?: string[], cb?: Callback): PromiseOrVoid {
+    return callbackifyOrPromise(this.promisifiedAutoupdate(models), cb);
+  }
+
+  protected async promisifiedAutoupdate(models?: string[]): Promise<void> {
+    try {
+      const tables: Table[] = [];
+      if (models) {
+        models.forEach((model) => {
+          const metaModel = this.getMetaModel(model, true);
+          tables.push(metaModel.table);
+        });
+      }
+      const connection = await this._crudConnector.getConnection();
+
+      const autoUpgrader = new AutoUpgrader(connection);
+      await autoUpgrader.upgradeTables(tables);
+      try {
+        await connection.close();
+      } catch (_ignore) {
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  /**
+   * Check if the models exist and are up-to-date
+   *
+   * @param [models] - The model name or array of model names
+   * @param [cb] - The callback function
+   */
+  isActual(models?: string|string[], cb?: Callback): PromiseOrVoid;
+  isActual(cb?: Callback): PromiseOrVoid;
+  isActual(models?: string|string[]|Callback, cb?: Callback): PromiseOrVoid {
+    if (!cb && typeof models === 'function') {
+      cb = models;
+      models = undefined;
+    }
+    if (models && typeof models === 'string') {
+      models = [models];
+    }
+    models = models || Object.keys((this as any)._models);
+    return this._isActual(models as string[], cb);
+  }
+
+  protected _isActual(models?: string[], cb?: Callback): PromiseOrVoid {
+    return callbackifyOrPromise(this.promisifiedIsActual(models), cb);
+  }
+
+  protected async promisifiedIsActual(models?: string[]): Promise<void> {
+    try {
+      const tables: Table[] = [];
+      if (models) {
+        models.forEach((model) => {
+          const metaModel = this.getMetaModel(model, true);
+          tables.push(metaModel.table);
+        });
+      }
+      const connection = await this._crudConnector.getConnection();
+
+      const autoUpgrader = new AutoUpgrader(connection);
+      await autoUpgrader.isActual(tables);
+      try {
+        await connection.close();
+      } catch (_ignore) {
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
   // *************************************************************************************
-  // autoupdate
+  // discover
+  // -------------------------------------------------------------------------------------
 
 
-  // *************************************************************************************
-
-  /*
-
-  TODO: see node_modules/loopback-connector/lib/sql.js:
-
-  getColumnsToAdd(model, fields);
-  getColumnsToDrop(model, fields);
-  buildColumnType(property);
-  alterTable(model, fields, indexes, cb);
-  showFields(model, cb);
-  showIndexes(model, cb);
-  paginateSQL(sql, orderBy, options)
-  buildQueryTables(options)
-  buildQueryViews(options)
-  buildQueryColumns(schema, table)
-  buildPropertyType(columnDefinition, options)
-  getArgs(table, options, cb)
-  buildQueryPrimaryKeys(schema, table)
-  buildQueryForeignKeys(schema, table)
-  buildQueryExportedForeignKeys(schema, table)
-  getDefaultSchema(options)
-  setDefaultOptions(options)
-  setNullableProperty(property)
-
-
-  */
   // *************************************************************************************
   // model definitions
+  // -------------------------------------------------------------------------------------
 
-  // TODO: indexes
+  // TODO: indexes & foreign keys
 
-  getMetaModel(modelName: string): MetaModel {
+  getMetaModel(modelName: string, forceNew?: boolean): MetaModel {
     const model: any = (this as any)._models[modelName];
     /* istanbul ignore if */
     if (!model) {
@@ -454,7 +519,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
     let metaModelRef = this._metaModelMap.get(modelName);
     if (metaModelRef) {
-      if (model === metaModelRef.juggler) {
+      if (!forceNew && model === metaModelRef.jugglerModel) {
         return metaModelRef.ref;
       }
       // recreate
@@ -465,62 +530,38 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     const settings = model.settings || {};
     const modelOpts = (settings[this.name] || {}) as Sqlite3ModelOptions;
     debug(`registering model '${modelName}'`);
-    metaModelRef = {ref: new MetaModel(modelName), juggler: model};
+    metaModelRef = {ref: new MetaModel(modelName), jugglerModel: model};
 
     const tableOpts: TableOpts = {
       name: modelOpts.tableName || this.dbName(modelName),
       withoutRowId: modelOpts.withoutRowId
     };
     const properties = model.properties || {};
-    Object.keys(properties).forEach((propName) => {
-      // TODO?: if (!properties.hasOwnProperty(propName)) {
-      //  return;
-      // }
-      const property = properties[propName] || {};
-      // tslint:disable-next-line no-null-keyword triple-equals
-      if (!!property.id && !!property.generated) {
-        tableOpts.autoIncrement = true;
-      }
-      const propertyOpts =
-          (property[this.name] || {}) as Sqlite3PropertyOptions;
-      const fieldOpts: FieldOpts = {
-        name: propertyOpts.columnName || this.dbName(propName),
-        dbtype: propertyOpts.dbtype,
-        isJson: propertyOpts.isJson
-      };
-      const metaProp = metaModelRef!.ref.getPropertyAlways(propName);
-      metaProp.setPropertyType(property.type);
-      metaProp.addField(fieldOpts.name as string, !!property.id, fieldOpts);
-    });
+    Object.keys(properties)
+        .filter((propName) => properties.hasOwnProperty(propName))
+        .forEach((propName) => {
+          const property = properties[propName] || {};
+          // tslint:disable-next-line no-null-keyword triple-equals
+          if (property.id === true && property.generated) {
+            tableOpts.autoIncrement = true;
+          }
+          const propertyOpts =
+              (property[this.name] || {}) as Sqlite3PropertyOptions;
+          const fieldOpts: FieldOpts = {
+            name: propertyOpts.columnName || this.dbName(propName),
+            dbtype: propertyOpts.dbtype,
+            isJson: propertyOpts.isJson
+          };
+          const metaProp = metaModelRef!.ref.getPropertyAlways(propName);
+          metaProp.setPropertyType(property.type);
+          metaProp.addField(fieldOpts.name as string, !!property.id, fieldOpts);
+        });
     metaModelRef!.ref.init(tableOpts);
     this._metaModelMap.set(metaModelRef!.ref.name, metaModelRef);
     return metaModelRef!.ref;
   }
-
-  // *************************************************************************************
-  // promisified helper functions
-
-  public async promisifiedExecuteSql(
-      sql: string, params?: any[],
-      options?: Sqlite3ExecuteOptions): Promise<any[]|SqlRunResult> {
-    params = params || [];
-    options = options || {};
-    let res: any[]|SqlRunResult;
-    try {
-      const transaction = options && options.transaction;
-      if (transaction && transaction.connection &&
-          transaction.connector === this) {
-        res = await this._crudConnector.runSQL(
-            transaction.connection, sql, params);
-      } else {
-        res = await this._crudConnector.execSql(sql, params);
-      }
-    } catch (err) {
-      return Promise.reject(err);
-    }
-    return Promise.resolve(res);
-  }
 }
+
 
 /**
  *

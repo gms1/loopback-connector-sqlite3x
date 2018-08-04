@@ -17,11 +17,11 @@ describe('loopback-connector connections', () => {
 
     await ds.connect();
     should(connector.pool.isOpen()).be.true();
-    await connector.connect();  // to increase coverage
+    await connector.connect();
     await connector.ping();
     await ds.disconnect();
     should(connector.pool.isOpen()).be.false();
-    await connector.disconnect();  // to increase coverage
+    await connector.disconnect();
   });
 
   it('should fail to connect to wrong db file (lazyConnect and connect() having callback)',

@@ -16,14 +16,13 @@
 
 ### DONE
 
-* auto migrate
+* auto-migrate and auto-update
 * connection pool
 * decorators for advanced mapping of models written in TypeScript/JavaScript to a sqlite3 database schema
 * full control over the names for tables, fields and foreign key constraints in the mapped database schema
 
 ### TODO
 
-* auto update
 * discovering models
 * LB4 CrudConnector ?
 

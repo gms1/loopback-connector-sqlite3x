@@ -17,6 +17,17 @@ describe('crud-connector connections', () => {
     await crudCon.disconnect();
   });
 
+  it('should connect using custom settings', async () => {
+    const crudCon = new Sqlite3CrudConnector({min: 3, max: 3});
+    await crudCon.connect();
+    should(crudCon.pool.isOpen()).be.true();
+    await crudCon.connect();
+    await crudCon.ping();
+    await crudCon.disconnect();
+    should(crudCon.pool.isOpen()).be.false();
+    await crudCon.disconnect();
+  });
+
   it('should fail to connect to wrong db file', async () => {
     const crudCon = new Sqlite3CrudConnector(
         {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});

@@ -343,22 +343,18 @@ export class Sqlite3CrudConnector implements Connector /*, CrudConnector*/ {
    * release connection afterwards
    */
   async execSql(sql: string, params?: any[]): Promise<any[]|SqlRunResult> {
-    let connection: SqlDatabase|undefined;
-    let res: any[]|SqlRunResult;
     try {
-      connection = await this.getConnection();
-      res = await this.runSQL(connection, sql, params);
+      const connection = await this.getConnection();
+      const res = await this.runSQL(connection, sql, params);
       // release connection to pool
-    } catch (err) {
-      if (connection) {
-        try {
-          await connection.close();
-        } catch (e) {
-        }
+      try {
+        await connection.close();
+      } catch (_ignore) {
       }
+      return res;
+    } catch (err) {
       return Promise.reject(err);
     }
-    return res;
   }
 
   /**
@@ -368,10 +364,18 @@ export class Sqlite3CrudConnector implements Connector /*, CrudConnector*/ {
    */
   async commit(connection: SqlDatabase): Promise<void> {
     debug('commit transaction');
+    let err;
     try {
       await Sqlite3CrudConnector.runDML(connection, `COMMIT TRANSACTION`);
+    } catch (e) /* istanbul ignore next */ {
+      err = e;
+    }
+    try {
       await connection.close();
-    } catch (err) /* istanbul ignore next */ {
+    } catch (_ignore) {
+    }
+    /* istanbul ignore if */
+    if (err) {
       return Promise.reject(err);
     }
   }
@@ -406,6 +410,7 @@ export class Sqlite3CrudConnector implements Connector /*, CrudConnector*/ {
   static runDML(conn: SqlDatabase, sql: string, params?: any[]):
       Promise<SqlRunResult> {
     return conn.run(sql, params).catch((err) => {
+      /* istanbul ignore else */
       if (err && err.message.match(/UNIQUE constraint failed/i)) {
         err.message = `DUPLICATE: ${err.message}`;
       }
@@ -419,30 +424,14 @@ export class Sqlite3CrudConnector implements Connector /*, CrudConnector*/ {
     const execCounter = ++this.execCounter;
     try {
       let res: any[]|SqlRunResult;
-      debug(`sql(${execCounter}): ${sql}`);
-      if (Array.isArray(params) && params.length) {
-        debug(`sql(${execCounter}): params: `, params);
-      }
       const sqlType = sql.trimLeft().substring(0, 6).toUpperCase();
       if (sqlType === 'SELECT' || sqlType === 'PRAGMA') {
         res = await Sqlite3CrudConnector.runDQL(conn, sql, params);
-        debug(`sql(${execCounter}): succeeded (records: ${res.length})`);
-        debug(
-            `sql(${execCounter}): result: `, JSON.stringify(res, undefined, 2));
       } else {
         res = await Sqlite3CrudConnector.runDML(conn, sql, params);
-        if (res.lastID) {
-          debug(
-              `sql(${execCounter}): succeeded (records: ${
-                                                          res.changes
-                                                        }, id: ${res.lastID})`);
-        } else {
-          debug(`sql(${execCounter}): succeeded (records: ${res.changes})`);
-        }
       }
       return Promise.resolve(res);
     } catch (err) {
-      debug(`sql(${execCounter}): failed: `, err);
       return Promise.reject(err);
     }
   }
