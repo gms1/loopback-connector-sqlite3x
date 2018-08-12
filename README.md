@@ -16,7 +16,7 @@
 
 ### DONE
 
-* auto-migrate and auto-update
+* auto-migrate and auto-update for tables, indexes, foreign keys
 * connection pool
 * decorators for advanced mapping of models written in TypeScript/JavaScript to a sqlite3 database schema
 * full control over the names for tables, fields and foreign key constraints in the mapped database schema
@@ -24,7 +24,8 @@
 ### TODO
 
 * discovering models
-* LB4 CrudConnector ?
+* LB4 CrudConnector
+* incompatibility to legacy sqlite3 connector, by which dates are stored in 'milliseconds' although accuracy is only 'seconds'
 
 ## Installation
 
@@ -32,18 +33,176 @@
 npm install loopback-connector-sqlite3x --save
 ```
 
-## Settings
+## Connector settings
 
-TODO
+```TypeScript
+
+export interface Sqlite3AllSettings {
+  /**
+   * [file=shared memory] - The database file to open
+   */
+  file: string;
+  /**
+   * [mode=SQL_OPEN_DEFAULT] - The mode for opening the database file
+   * A bit flag combination of:
+   *   SQL_OPEN_CREATE,
+   *   SQL_OPEN_READONLY,
+   *   SQL_OPEN_READWRITE
+   * SQL_OPEN_DEFAULT = SQL_OPEN_CREATE | SQL_OPEN_READWRITE
+   */
+  mode: number;
+  /**
+   * [min=1] - Minimum connections which should be opened by the connection pool
+   */
+  poolMin: number;
+  /*
+   * [max=0] - Maximum connections which can be opened by this connection pool
+   */
+  poolMax: number;
+  /*
+   * [debug=false] - enable debug
+   */
+  debug: boolean;
+  /*
+   * [lazyConnect=false] - enable lazy connect
+   */
+  lazyConnect: boolean;
+  /*
+   * [schemaName='main'] - the default schema
+   */
+  schemaName: string;
+  /*
+   * [dbSettings]
+   */
+  dbSettings: SqlDatabaseSettings;
+}
+
+/*
+ *  for a description of the pragma setting see: https://www.sqlite.org/pragma.html
+ *  for a description of the execution mode see: https://github.com/mapbox/node-sqlite3/wiki/Control-Flow
+ */
+export interface SqlDatabaseSettings {
+  /*
+   * PRAGMA schema.journal_mode = DELETE | TRUNCATE | PERSIST | MEMORY | WAL | OFF
+   */
+  journalMode?: string|string[];
+  /*
+   * PRAGMA busy_timeout = milliseconds
+   */
+  busyTimeout?: number;
+  /*
+   * PRAGMA schema.synchronous = OFF | NORMAL | FULL | EXTRA;
+   */
+  synchronous?: string|string[];
+  /*
+   * PRAGMA case_sensitive_like = TRUE | FALSE
+   */
+  caseSensitiveLike?: string;
+
+  /*
+   * PRAGMA foreign_keys = TRUE | FALSE
+   */
+  foreignKeys?: string;
+
+  /*
+   * PRAGMA ignore_check_constraints = TRUE | FALSE
+   */
+  ignoreCheckConstraints?: string;
+
+  /*
+   * PRAGMA query_only = TRUE | FALSE
+   */
+  queryOnly?: string;
+
+  /*
+   * PRAGMA read_uncommitted = TRUE | FALSE
+   */
+  readUncommitted?: string;
+
+  /*
+   * PRAGMA recursive_triggers = TRUE | FALSE
+   */
+  recursiveTriggers?: string;
+
+  /*
+   * PRAGMA schema.secure_delete = TRUE | FALSE | FAST
+   */
+  secureDelete?: string|string[];
+
+  /*
+   *  SERIALIZE | PARALLELIZE
+   */
+  executionMode?: string;
+}
+```
 
 ## Model definition
 
+You can use the 'sqlite3x' model property to specify additional database-specific properties for a LoopBack model.
 
-TODO
+```TypeScript
+{
+    name: 'TestModel',
+    options:
+        {
+          sqlite3x: {tableName: 'TEST_MODEL'}
+        },
 
-see: [sqlite3orm](https://github.com/gms1/node-sqlite3-orm)
+```
 
-## Type mapping
+### properties
+
+```TypeScript
+{
+    name: 'TestModel',
+    properties: {
+      id: {
+        type: 'Number',
+        id: 1,
+        sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
+      },
+      created: {
+        type: 'Date'
+        sqlite3x: {columnName 'CREATED', dbtype: 'INTEGER DEFAULT(strftime(\'%s\',\'now\'))'}
+      }
+
+```
+
+<!-- -->
+> NOTE: specifying indexes at the model property level is not supported
+
+#### default type mapping
+
+| LoopBack type | Database type |
+|-----|-----|
+| Number| INTEGER if primary key, REAL otherwise |
+| Boolean | INTEGER 1 or 0 |
+| Date | INTEGER seconds since Jan 01 1970 |
+| String | TEXT |
+| JSON / Complex types | TEXT in JSON format |
+
+### indexes
+
+you can define indexes using the loopback 'indexes' property in the standard or shortened form, as well as using the MySql form
+
+<!-- -->
+> NOTE: specifying indexes at the model property level is not supported
+
+### foreign key constraints
+
+It seems there is no standard way to define database-specific foreign key constraints using loopback, therefore a new way has been introduced:
+You can define foreign keys using a 'foreignKeys' property
+
+```Json
+"foreignKeys": {
+    "<constraint identifier>": {
+      "columns": "<column identifier>[,<column identifier>]...",
+      "refTable": "<table identifier>",
+      "refColumns": "<column identifier>[,<column identifier>]...",
+    }
+  }
+```
+
 
 ## License
 

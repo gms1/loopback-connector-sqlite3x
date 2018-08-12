@@ -1,12 +1,12 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
-import {SqlDatabase} from 'sqlite3orm';
 
 import {Sqlite3JugglerConnector} from '../../..';
+import {SqlDatabase} from '../../../../../node-sqlite3-orm/dist';
 import {Transaction} from '../../../export-lc';
 
-import {initDataSource} from './test-init';
+import {initDataSource} from '../core/test-init';
 
 
 describe('loopback-connector transaction', () => {

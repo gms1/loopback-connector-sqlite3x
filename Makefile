@@ -1,4 +1,4 @@
-.PHONY: default test test_fast coverage coverage_fast
+.PHONY: default test coverage coverage_minimal
 
 NODE_VERSION := $(shell node -v | awk -F. '{sub(/v/,""); print $$1}')
 
@@ -9,19 +9,14 @@ coverage:
 	npm run coverage:run
 	npm run coverage:html
 
-coverage_fast:
+coverage_minimal:
 	-rm -rf coverage
-	npm run coverage:run -- --grep imported --invert
+	npm run coverage:minimal
 	npm run coverage:html
-
-
-test_fast:
-	npm run test:run -- --grep imported --invert
 
 test:
 	npm run clean
 	npm run build
-	npm run test:run
-	@echo nodejs=$(NODE_VERSION)
-	@if [ "$(NODE_VERSION)" -gt 6 ]; then npm run coverage:run; fi
+	npm run coverage:run
+	npm run coverage:html
 

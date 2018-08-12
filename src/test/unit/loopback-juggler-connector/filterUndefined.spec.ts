@@ -3,10 +3,9 @@
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 import * as sinon from 'sinon';
-
 import {Sqlite3JugglerConnector} from '../../..';
 
-import {getDataSource, initDataSource} from './test-init';
+import {getDataSource, initDataSource} from '../core/test-init';
 
 initDataSource();
 
@@ -15,13 +14,10 @@ describe('loopback-datasource-juggler filter undefined fields', () => {
   let db: any;
   let connector: Sqlite3JugglerConnector;
 
-  const schemaName = 'PostFilterUndefined';
-  const schemas = {
-    name: schemaName,
-    options: {
-      idInjection: false,
-      sqlite3x: {tableName: 'POST_FILTER_UNDEFINED', autoIncrement: true}
-    },
+  const postFilterUndefinedSchema = {
+    name: 'PostFilterUndefined',
+    options:
+        {idInjection: false, sqlite3x: {tableName: 'POST_FILTER_UNDEFINED'}},
     properties: {
       id: {
         type: 'Number',
@@ -42,16 +38,27 @@ describe('loopback-datasource-juggler filter undefined fields', () => {
     db = ds as any;
     should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
     connector = ds.connector as Sqlite3JugglerConnector;
-    const models: any = db.modelBuilder.buildModels(schemas);
-    Post = models[schemaName];
+    const models: any = db.modelBuilder.buildModels(postFilterUndefinedSchema);
+    Post = models[postFilterUndefinedSchema.name];
     Post.attachTo(db);
   });
 
   before((done) => {
-    ds.automigrate(schemaName, (err) => {
+    ds.automigrate(postFilterUndefinedSchema.name, (err) => {
       should.not.exists(err);
       done();
     });
+  });
+
+
+  after(async () => {
+    try {
+      await connector.dropTable(postFilterUndefinedSchema.name);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    connector.destroyMetaModel(postFilterUndefinedSchema.name);
+    return;
   });
 
   it('should insert only default value', (done) => {

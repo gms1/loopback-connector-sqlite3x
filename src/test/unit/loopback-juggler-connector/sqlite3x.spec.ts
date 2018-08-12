@@ -1,12 +1,13 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable variable-name no-null-keyword
+import {fail} from 'assert';
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 import * as sinon from 'sinon';
 
 import {Sqlite3JugglerConnector} from '../../..';
 
-import {getDataSource, initDataSource} from './test-init';
+import {getDataSource, initDataSource} from '../core/test-init';
 
 initDataSource();
 
@@ -15,13 +16,9 @@ describe('loopback-datasource-juggler sqlite3x', () => {
   let db: any;
   let connector: Sqlite3JugglerConnector;
 
-  const schemaName = 'PostBasic';
-  const schemas = {
-    name: schemaName,
-    options: {
-      idInjection: false,
-      sqlite3x: {tableName: 'POST_BASIC', autoIncrement: true}
-    },
+  const postBasicSchema = {
+    name: 'PostBasic',
+    options: {idInjection: false, sqlite3x: {tableName: 'POST_BASIC'}},
     properties: {
       id: {
         type: 'Number',
@@ -48,16 +45,26 @@ describe('loopback-datasource-juggler sqlite3x', () => {
     should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
     connector = ds.connector as Sqlite3JugglerConnector;
     escapedID = connector.escapeName('ID') as string;
-    const models: any = db.modelBuilder.buildModels(schemas);
-    Post = models[schemaName];
+    const models: any = db.modelBuilder.buildModels(postBasicSchema);
+    Post = models[postBasicSchema.name];
     Post.attachTo(db);
   });
 
   before((done) => {
-    ds.automigrate(schemaName, (err) => {
+    ds.automigrate(postBasicSchema.name, (err) => {
       should.not.exists(err);
       done();
     });
+  });
+
+  after(async () => {
+    try {
+      await connector.dropTable(postBasicSchema.name);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    connector.destroyMetaModel(postBasicSchema.name);
+    return;
   });
 
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import {SqlDatabase} from 'sqlite3orm';
+import {SqlDatabase} from '../../node-sqlite3-orm/dist';
 // tslint:disable-next-line no-unnecessary-class
 declare class Sqlite3Connector {}
 

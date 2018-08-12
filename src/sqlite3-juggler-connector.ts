@@ -1,22 +1,18 @@
-// resolve types only:
 // tslint:disable no-implicit-dependencies no-string-literal
-// tslint:disable no-non-null-assertion
 
-
+import {juggler} from '@loopback/repository';
 import {Callback, DataSource, Filter, PromiseOrVoid, PropertyDefinition, TransactionMixin} from 'loopback-datasource-juggler';
-import {AutoUpgrader, FieldOpts, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table, TableOpts} from 'sqlite3orm';
+import {AutoUpgrader, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table} from '../../node-sqlite3-orm/dist';
 
 import {ParameterizedSQL, SQLConnector} from './export-lc';
-import {SQLITE3_CONNECTOR_NAME, Sqlite3CrudConnector} from './sqlite3-crud-connector';
-import {Sqlite3ExecuteOptions, Sqlite3ModelOptions, Sqlite3PropertyOptions} from './sqlite3-options';
+import {SQLITE3_CONNECTOR_NAME, Sqlite3Connector} from './sqlite3-connector';
+import {Sqlite3ExecuteOptions} from './sqlite3-options';
 import {Sqlite3Settings} from './sqlite3-settings';
-import {callbackifyOrPromise, MetaModelRef} from './utils';
+import {callbackifyOrPromise} from './utils';
 
-
-export const name = SQLITE3_CONNECTOR_NAME;
-
+/* istanbul ignore next */
 function debug(arg: any, ...args: any[]): void {
-  Sqlite3CrudConnector.debug(arg, ...args);
+  Sqlite3Connector.debug(arg, ...args);
 }
 
 /*
@@ -26,18 +22,20 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     TransactionMixin {
   readonly name: string = SQLITE3_CONNECTOR_NAME;
 
-  private _metaModelMap: Map<string, MetaModelRef>;
-
-  private _crudConnector: Sqlite3CrudConnector;
+  private connector: Sqlite3Connector;
 
   get pool(): SqlConnectionPool {
-    return this._crudConnector.pool;
+    return this.connector.pool;
   }
 
   constructor(settings: Sqlite3Settings|Object) {
     super(SQLITE3_CONNECTOR_NAME, settings);
-    this._metaModelMap = new Map<string, MetaModelRef>();
-    this._crudConnector = new Sqlite3CrudConnector(settings);
+    this.connector = new Sqlite3Connector(settings);
+  }
+
+  /* istanbul ignore next */
+  static debug(arg: any, ...args: any[]): void {
+    debug(arg, ...args);
   }
 
   // *************************************************************************************
@@ -50,7 +48,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    * @callback [cb] The callback function
    */
   connect(cb?: Callback<void>): PromiseOrVoid {
-    return callbackifyOrPromise(this._crudConnector.connect(), cb);
+    return callbackifyOrPromise(this.connector.connect(), cb);
   }
 
   /**
@@ -59,7 +57,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    * @callback [cb] The callback function
    */
   disconnect(cb?: Callback<void>): PromiseOrVoid {
-    return callbackifyOrPromise(this._crudConnector.disconnect(), cb);
+    return callbackifyOrPromise(this.connector.disconnect(), cb);
   }
 
   /**
@@ -68,7 +66,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    * @callback [cb] The callback function
    */
   ping(cb?: Callback<void>): PromiseOrVoid {
-    return callbackifyOrPromise(this._crudConnector.ping(), cb);
+    return callbackifyOrPromise(this.connector.ping(), cb);
   }
 
   // *************************************************************************************
@@ -88,15 +86,15 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   }
 
   protected _beginTransaction(cb?: Callback): PromiseOrVoid {
-    return callbackifyOrPromise(this._crudConnector.begin(), cb);
+    return callbackifyOrPromise(this.connector.begin(), cb);
   }
 
   commit(connection: SqlDatabase, cb?: Callback): PromiseOrVoid {
-    return callbackifyOrPromise(this._crudConnector.commit(connection), cb);
+    return callbackifyOrPromise(this.connector.commit(connection), cb);
   }
 
   rollback(connection: SqlDatabase, cb?: Callback): PromiseOrVoid {
-    return callbackifyOrPromise(this._crudConnector.rollback(connection), cb);
+    return callbackifyOrPromise(this.connector.rollback(connection), cb);
   }
 
   // *************************************************************************************
@@ -151,10 +149,9 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
       const transaction = options && options.transaction;
       if (transaction && transaction.connection &&
           transaction.connector === this) {
-        res = await this._crudConnector.runSQL(
-            transaction.connection, sql, params);
+        res = await this.connector.runSQL(transaction.connection, sql, params);
       } else {
-        res = await this._crudConnector.execSql(sql, params);
+        res = await this.connector.execSql(sql, params);
       }
     } catch (err) {
       return Promise.reject(err);
@@ -194,10 +191,14 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   // tslint:disable cyclomatic-complexity
   fromColumnValue(prop: PropertyDefinition, value: any): any {
-    // tslint:disable-next-line triple-equals no-null-keyword
-    if (value == null || !prop) {
+    if (!prop) {
       return value;
     }
+    // tslint:disable triple-equals no-null-keyword
+    if (value == null) {
+      return null;
+    }
+    // tslint:enable triple-equals no-null-keyword
 
     const type = (prop.type as any).name;
     // const propertyOpts = (prop[this.name] || {}) as Sqlite3PropertyOptions;
@@ -258,13 +259,15 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
 
   toColumnValue(prop: PropertyDefinition, value: any): any {
-    // tslint:disable-next-line no-null-keyword
-    if (value == null || !prop) {
+    if (!prop) {
       return value;
     }
-
-    // TODO: currently we are assuming that the default datatype mapping is in
-    // use!
+    // tslint:disable-next-line triple-equals
+    if (value == undefined) {
+      // tslint:disable-next-line no-null-keyword
+      return null;
+    }
+    // TODO: here we are assuming that the default datatype mapping is in use!
     //    Boolean => INTEGER
     //    Date => INTEGER
     const type = (prop.type as any).name;
@@ -305,11 +308,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    */
 
   dbName(modelOrProperty?: string): string|undefined {
-    /* istanbul ignore if */
-    if (!modelOrProperty) {
-      return modelOrProperty;
-    }
-    return modelOrProperty.toLowerCase();
+    return this.connector.dbName(modelOrProperty);
   }
 
 
@@ -366,6 +365,8 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   // *************************************************************************************
   // automigration/autoupdate/isActual
   // -------------------------------------------------------------------------------------
+  // TODO(?): add foreign_key_check to automigrate and autoupdate if foreign
+  // keys are enabled?
 
   /**
    * Create the table for the given model
@@ -440,7 +441,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
           tables.push(metaModel.table);
         });
       }
-      const connection = await this._crudConnector.getConnection();
+      const connection = await this.connector.getConnection();
 
       const autoUpgrader = new AutoUpgrader(connection);
       await autoUpgrader.upgradeTables(tables);
@@ -486,7 +487,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
           tables.push(metaModel.table);
         });
       }
-      const connection = await this._crudConnector.getConnection();
+      const connection = await this.connector.getConnection();
 
       const autoUpgrader = new AutoUpgrader(connection);
       await autoUpgrader.isActual(tables);
@@ -500,67 +501,46 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   }
 
   // *************************************************************************************
-  // discover
+  // TODO(?): discover model definition
   // -------------------------------------------------------------------------------------
 
+  // discoverModelDefinitions
+  // discoverModelProperties
+  // discoverPrimaryKeys
+  // discoverForeignKeys
+  // discoverExportedForeignKeys
+  // discoverSchema
+
+  // discoverAndBuildModels
 
   // *************************************************************************************
   // model definitions
   // -------------------------------------------------------------------------------------
 
-  // TODO: indexes & foreign keys
-
-  getMetaModel(modelName: string, forceNew?: boolean): MetaModel {
-    const model: any = (this as any)._models[modelName];
+  getMetaModel(modelName: string, recreate?: boolean): MetaModel {
+    const lbModelDef: any /* juggler.PersistedModelClass */ =
+        (this as any)._models[modelName];
     /* istanbul ignore if */
-    if (!model) {
+    if (!lbModelDef) {
       throw new Error(`model '${modelName}' not found`);
     }
+    return this.connector.getMetaModelFromJuggler(
+        modelName, lbModelDef, recreate);
+  }
 
-    let metaModelRef = this._metaModelMap.get(modelName);
-    if (metaModelRef) {
-      if (!forceNew && model === metaModelRef.jugglerModel) {
-        return metaModelRef.ref;
-      }
-      // recreate
-      this._metaModelMap.delete(modelName);
-      metaModelRef.ref.destroy();
-    }
+  destroyMetaModel(modelName: string): void {
+    this.connector.destroyMetaModel(modelName);
+  }
 
-    const settings = model.settings || {};
-    const modelOpts = (settings[this.name] || {}) as Sqlite3ModelOptions;
-    debug(`registering model '${modelName}'`);
-    metaModelRef = {ref: new MetaModel(modelName), jugglerModel: model};
+  destroyAllMetaModels(): void {
+    this.connector.destroyAllMetaModels();
+  }
 
-    const tableOpts: TableOpts = {
-      name: modelOpts.tableName || this.dbName(modelName),
-      withoutRowId: modelOpts.withoutRowId
-    };
-    const properties = model.properties || {};
-    Object.keys(properties)
-        .filter((propName) => properties.hasOwnProperty(propName))
-        .forEach((propName) => {
-          const property = properties[propName] || {};
-          // tslint:disable-next-line no-null-keyword triple-equals
-          if (property.id === true && property.generated) {
-            tableOpts.autoIncrement = true;
-          }
-          const propertyOpts =
-              (property[this.name] || {}) as Sqlite3PropertyOptions;
-          const fieldOpts: FieldOpts = {
-            name: propertyOpts.columnName || this.dbName(propName),
-            dbtype: propertyOpts.dbtype,
-            isJson: propertyOpts.isJson
-          };
-          const metaProp = metaModelRef!.ref.getPropertyAlways(propName);
-          metaProp.setPropertyType(property.type);
-          metaProp.addField(fieldOpts.name as string, !!property.id, fieldOpts);
-        });
-    metaModelRef!.ref.init(tableOpts);
-    this._metaModelMap.set(metaModelRef!.ref.name, metaModelRef);
-    return metaModelRef!.ref;
+  modelNames(): string[] {
+    return this.connector.metaModels.modelNames();
   }
 }
+
 
 
 /**
@@ -573,7 +553,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 export function initialize(dataSource: DataSource, cb?: Callback<void>): void {
   /* istanbul ignore if */
   if (dataSource.settings && !!dataSource.settings.debug) {
-    Sqlite3CrudConnector.debugEnabled = true;
+    Sqlite3Connector.debugEnabled = true;
   }
   debug(`initialize ${SQLITE3_CONNECTOR_NAME} juggler connector...`);
   const connector =
