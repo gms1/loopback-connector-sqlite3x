@@ -1,6 +1,6 @@
 # loopback-connector-sqlite3x
 
-## UNDER CONSTRUCTION
+alternative and unofficial LoopBack connector for SQLite3.
 
 [![npm version](https://badge.fury.io/js/loopback-connector-sqlite3x.svg)](https://badge.fury.io/js/loopback-connector-sqlite3x)
 [![Known Vulnerabilities](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x/badge.svg)](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x)
@@ -10,23 +10,17 @@
 [![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
 [![Greenkeeper badge](https://badges.greenkeeper.io/gms1/loopback-connector-sqlite3x.svg)](https://greenkeeper.io/)
 
-**loopback-connector-sqlite3x** alternative LoopBack connector for SQLite3.
-
 ## Features
-
-### DONE
 
 * auto-migrate and auto-update for tables, indexes, foreign keys
 * connection pool
-* decorators for advanced mapping of models written in TypeScript/JavaScript to a sqlite3 database schema
 * full control over the names for tables, fields and foreign key constraints in the mapped database schema
 
 ### TODO
 
 * discovering models
-* LB4 CrudConnector
-* incompatibility to legacy sqlite3 connector, by which dates are stored in 'milliseconds' although accuracy is only 'seconds'
-
+* LB4 CrudConnector, but only if we gain any advantage
+  
 ## Installation
 
 ```shell
@@ -78,8 +72,16 @@ export interface Sqlite3AllSettings {
 }
 
 /*
+ * additional database settings
+ * 
  *  for a description of the pragma setting see: https://www.sqlite.org/pragma.html
  *  for a description of the execution mode see: https://github.com/mapbox/node-sqlite3/wiki/Control-Flow
+ * 
+ * defaults:
+ *   journalMode 'WAL'
+ *   busyTimout = 3000
+ *   readUncommitted = 'FALSE
+ *   executionMode = 'PARALLELIZE'
  */
 export interface SqlDatabaseSettings {
   /*
@@ -138,7 +140,7 @@ export interface SqlDatabaseSettings {
 
 ## Model definition
 
-You can use the 'sqlite3x' model property to specify additional database-specific properties for a LoopBack model.
+You can use the 'sqlite3x' property to specify additional database-specific options to a LoopBack model (see Sqlite3ModelOptions).
 
 ```TypeScript
 {
@@ -152,6 +154,8 @@ You can use the 'sqlite3x' model property to specify additional database-specifi
 
 ### properties
 
+You can use the 'sqlite3x' property to specify additional database-specific options to a LoopBack property (see Sqlite3PropertyOptions).
+
 ```TypeScript
 {
     name: 'TestModel',
@@ -163,13 +167,10 @@ You can use the 'sqlite3x' model property to specify additional database-specifi
       },
       created: {
         type: 'Date'
-        sqlite3x: {columnName 'CREATED', dbtype: 'INTEGER DEFAULT(strftime(\'%s\',\'now\'))'}
+        sqlite3x: {columnName 'CREATED'}
       }
 
 ```
-
-<!-- -->
-> NOTE: specifying indexes at the model property level is not supported
 
 #### default type mapping
 
@@ -177,9 +178,10 @@ You can use the 'sqlite3x' model property to specify additional database-specifi
 |-----|-----|
 | Number| INTEGER if primary key, REAL otherwise |
 | Boolean | INTEGER 1 or 0 |
-| Date | INTEGER seconds since Jan 01 1970 |
+| Date | INTEGER milliseconds since Jan 01 1970 |
 | String | TEXT |
 | JSON / Complex types | TEXT in JSON format |
+
 
 ### indexes
 
@@ -196,13 +198,12 @@ You can define foreign keys using a 'foreignKeys' property
 ```Json
 "foreignKeys": {
     "<constraint identifier>": {
-      "columns": "<column identifier>[,<column identifier>]...",
+      "properties": "<property key>[,<property key>]...",
       "refTable": "<table identifier>",
       "refColumns": "<column identifier>[,<column identifier>]...",
     }
   }
 ```
-
 
 ## License
 

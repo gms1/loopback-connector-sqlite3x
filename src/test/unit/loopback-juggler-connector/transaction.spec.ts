@@ -1,11 +1,10 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
+import {SqlDatabase} from 'sqlite3orm';
 
 import {Sqlite3JugglerConnector} from '../../..';
-import {SqlDatabase} from '../../../../../node-sqlite3-orm/dist';
 import {Transaction} from '../../../export-lc';
-
 import {initDataSource} from '../core/test-init';
 
 
@@ -28,6 +27,14 @@ describe('loopback-connector transaction', () => {
     }
   });
 
+  afterEach(async () => {
+    try {
+      await connection.run('DELETE FROM TEST');
+    } catch (err) {
+      err.should.fail();
+    }
+  });
+
   after(async () => {
     try {
       await connection.exec('DROP TABLE TEST');
@@ -36,14 +43,6 @@ describe('loopback-connector transaction', () => {
       connector = undefined as any as Sqlite3JugglerConnector;
       await ds.disconnect();
       ds = undefined as any as DataSource;
-    } catch (err) {
-      err.should.fail();
-    }
-  });
-
-  afterEach(async () => {
-    try {
-      await connection.run('DELETE FROM TEST');
     } catch (err) {
       err.should.fail();
     }
@@ -137,4 +136,14 @@ describe('loopback-connector transaction', () => {
     rows.length.should.be.equal(0);
   });
 
+
+  it('basic transaction', async () => {
+    const conn = await connector.beginTransaction();
+    let rows: any[];
+
+    await conn.run('INSERT INTO TEST (id, col) values (1, \'commit test\')');
+    rows = await conn.all('SELECT id, col FROM TEST ORDER BY id');
+    rows.length.should.be.equal(1);
+    await connector.rollback(conn);
+  });
 });

@@ -3,10 +3,10 @@
 import {Connector, ModelDefinition} from '@loopback/repository';
 import _sg = require('strong-globalize');
 import * as _dbg from 'debug';
-import {SqlConnectionPool, SqlDatabase, SqlRunResult, SQL_MEMORY_DB_SHARED, SQL_OPEN_DEFAULT, MetaModel} from '../../node-sqlite3-orm/dist';
+import {SqlConnectionPool, SqlDatabase, SqlRunResult, SQL_MEMORY_DB_SHARED, SQL_OPEN_DEFAULT, MetaModel} from 'sqlite3orm';
 
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
-import {MetaModelReader} from './meta-model-reader';
+import {MetaModelFactory} from './meta-model-factory';
 
 const g = new _sg();
 
@@ -22,7 +22,7 @@ export class Sqlite3Connector implements Connector {
 
   readonly settings: Sqlite3AllSettings;
   readonly pool: SqlConnectionPool;
-  readonly metaModels: MetaModelReader;
+  readonly metaModels: MetaModelFactory;
 
   private execCounter: number;
 
@@ -46,7 +46,7 @@ export class Sqlite3Connector implements Connector {
     }
     this.settings = Sqlite3Connector.enrichInputSettings(settings || {});
     this.pool = new SqlConnectionPool();
-    this.metaModels = new MetaModelReader();
+    this.metaModels = new MetaModelFactory();
     this.execCounter = 0;
   }
 
@@ -217,7 +217,6 @@ export class Sqlite3Connector implements Connector {
   static runDML(conn: SqlDatabase, sql: string, params?: any[]):
       Promise<SqlRunResult> {
     return conn.run(sql, params).catch((err) => {
-      /* istanbul ignore else */
       if (err && err.message.match(/UNIQUE constraint failed/i)) {
         err.message = `DUPLICATE: ${err.message}`;
       }
@@ -238,7 +237,7 @@ export class Sqlite3Connector implements Connector {
         res = await Sqlite3Connector.runDML(conn, sql, params);
       }
       return Promise.resolve(res);
-    } catch (err) {
+    } catch (err) /* istanbul ignore nothing */ {
       return Promise.reject(err);
     }
   }
@@ -248,10 +247,12 @@ export class Sqlite3Connector implements Connector {
   // model definitions
   // -------------------------------------------------------------------------------------
 
+  /* istanbul ignore next */
   getMetaModel(
       modelName: string, lbModelDef: ModelDefinition,
       recreate?: boolean): MetaModel {
-    return this.metaModels.getMetaModel(modelName, lbModelDef, recreate);
+    throw new Error(`not implemented yet`);
+    // return this.metaModels.getMetaModel(modelName, lbModelDef, recreate);
   }
 
   getMetaModelFromJuggler(
@@ -308,6 +309,7 @@ export class Sqlite3Connector implements Connector {
     if (!connectorSettings.dbSettings.executionMode) {
       connectorSettings.dbSettings.executionMode = 'PARALLELIZE';
     }
+
     return connectorSettings as Sqlite3AllSettings;
   }
 }

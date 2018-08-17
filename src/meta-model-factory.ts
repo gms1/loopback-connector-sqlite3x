@@ -1,6 +1,7 @@
 // tslint:disable no-non-null-assertion
-import {juggler, ModelDefinition} from '@loopback/repository';
-import {FieldOpts, FKDefinition, IDXDefinition, MetaModel, TableOpts} from '../../node-sqlite3-orm/dist';
+import {ModelDefinition} from '@loopback/repository';
+import * as juggler from 'loopback-datasource-juggler';
+import {FieldOpts, FKDefinition, IDXDefinition, MetaModel, PropertyType, TableOpts} from 'sqlite3orm';
 
 import {SQLITE3_CONNECTOR_NAME, Sqlite3Connector} from './sqlite3-connector';
 import {Sqlite3ModelOptions, Sqlite3PropertyOptions} from './sqlite3-options';
@@ -11,7 +12,7 @@ function debug(arg: any, ...args: any[]): void {
 
 interface MetaModelRef {
   metaModel: MetaModel;
-  lbModelDef?: any;  // juggler.PersistedModelClass;
+  lbModelDef?: juggler.ModelDefinition|ModelDefinition;
 }
 
 
@@ -19,13 +20,13 @@ interface MetaModelRef {
  * The MetaModel factory and registry
  */
 
-export class MetaModelReader {
+export class MetaModelFactory {
   /**
    * The one and only MetaModels instance
    *
    * @static
    */
-  public static models: MetaModelReader;
+  public static models: MetaModelFactory;
 
 
   readonly name!: string;
@@ -36,14 +37,14 @@ export class MetaModelReader {
    *
    */
   public constructor() {
-    if (!MetaModelReader.models) {
+    if (!MetaModelFactory.models) {
       this.name = SQLITE3_CONNECTOR_NAME;
       this.mapNameToMetaModel = new Map<string, MetaModelRef>();
 
       // initialize the 'singleton'
-      MetaModelReader.models = this;
+      MetaModelFactory.models = this;
     }
-    return MetaModelReader.models;
+    return MetaModelFactory.models;
   }
 
   /**
@@ -54,10 +55,23 @@ export class MetaModelReader {
    * @param [recreate]
    */
 
-  // TODO: this is for the CRUDConnector and currently not in use
+  // TODO: getMetaModel for the CRUDConnector is not implemented yet
   /* istanbul ignore next */
   getMetaModel(
       modelName: string, lbModelDef: ModelDefinition,
+      recreate?: boolean): MetaModel {
+    throw new Error(`getMetaModel is not implemented yet`);
+  }
+
+  /**
+   * get a MetaModel for a juggler model definition
+   *
+   * @param modelName
+   * @param lbModelDef
+   * @param [recreate]
+   */
+  getMetaModelFromJuggler(
+      modelName: string, lbModelDef: juggler.ModelDefinition,
       recreate?: boolean): MetaModel {
     let metaModelRef = this.mapNameToMetaModel.get(modelName);
     if (metaModelRef) {
@@ -83,99 +97,54 @@ export class MetaModelReader {
     Object.keys(properties)
         .filter((propName) => properties.hasOwnProperty(propName))
         .forEach((propName) => {
-          const property = properties[propName] || {};
+          const property = properties[propName];
+
+
           if (property.id && property.generated) {
             tableOpts.autoIncrement = true;
           }
           const propertyOpts =
               (property[this.name] || {}) as Sqlite3PropertyOptions;
-          const fieldOpts: FieldOpts = {
-            name: propertyOpts.columnName || this.dbName(propName),
-            dbtype: propertyOpts.dbtype,
-            isJson: propertyOpts.isJson
-          };
+          property[this.name] = propertyOpts;
+
           const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
           if (property.type &&
               (typeof property.type === 'function' ||
                typeof property.type === 'string')) {
             metaProp.setPropertyType(property.type);
           }
+          // applying defaults:
+          if (metaProp.propertyType === PropertyType.UNKNOWN) {
+            propertyOpts.isJson = true;
+          }
+          if (metaProp.propertyType === PropertyType.DATE &&
+              // tslint:disable-next-line triple-equals
+              propertyOpts.dateInMilliSeconds == undefined) {
+            propertyOpts.dateInMilliSeconds = true;
+          }
+
+          const fieldOpts: FieldOpts = {
+            name: propertyOpts.columnName || this.dbName(propName),
+            dbtype: propertyOpts.dbtype,
+            isJson: propertyOpts.isJson,
+            dateInMilliSeconds: propertyOpts.dateInMilliSeconds,
+            transform: propertyOpts.transform
+          };
+
           metaModelRef!.metaModel.setPropertyField(
               propName, !!property.id, fieldOpts);
           mapKeyToColName.set(propName, fieldOpts.name as string);
         });
     metaModelRef!.metaModel.init(tableOpts);
 
-    // indexes:
-    if (typeof settings.indexes === 'object') {
-      this.addIndexDefinitions(metaModelRef, settings.indexes);
-    }
-    // foreignKeys:
-    if (typeof settings.foreignKeys === 'object') {
-      this.addForeignKeyDefinitions(metaModelRef, settings.foreignKeys);
-    }
-
-    this.mapNameToMetaModel.set(metaModelRef!.metaModel.name, metaModelRef);
-    return metaModelRef!.metaModel;
-  }
-
-
-
-  /**
-   * get a MetaModel for a juggler model definition
-   *
-   * @param modelName
-   * @param lbModelDef
-   * @param [recreate]
-   */
-  getMetaModelFromJuggler(
-      modelName: string, lbModelDef: any, recreate?: boolean): MetaModel {
-    let metaModelRef = this.mapNameToMetaModel.get(modelName);
-    if (metaModelRef) {
-      if (!recreate && lbModelDef === metaModelRef.lbModelDef) {
-        return metaModelRef.metaModel;
+    Object.keys(properties).forEach((propName) => {
+      const property = properties[propName];
+      if (!property[this.name] || property[this.name].transform) {
+        return;
       }
-      this.destroyMetaModel(modelName);
-    }
-
-    const settings = lbModelDef.settings || {};
-    const modelOpts = (settings[this.name] || {}) as Sqlite3ModelOptions;
-    debug(`registering model '${modelName}'`);
-    metaModelRef = {metaModel: new MetaModel(modelName), lbModelDef};
-
-    const tableOpts: TableOpts = {
-      name: modelOpts.tableName || this.dbName(modelName),
-      withoutRowId: modelOpts.withoutRowId
-    };
-
-    // properties:
-    const properties = lbModelDef.properties || {};
-    const mapKeyToColName = new Map<string, string>();
-    Object.keys(properties)
-        .filter((propName) => properties.hasOwnProperty(propName))
-        .forEach((propName) => {
-          const property = properties[propName] || {};
-          if (property.id && property.generated) {
-            tableOpts.autoIncrement = true;
-          }
-          const propertyOpts =
-              (property[this.name] || {}) as Sqlite3PropertyOptions;
-          const fieldOpts: FieldOpts = {
-            name: propertyOpts.columnName || this.dbName(propName),
-            dbtype: propertyOpts.dbtype,
-            isJson: propertyOpts.isJson
-          };
-          const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
-          if (property.type &&
-              (typeof property.type === 'function' ||
-               typeof property.type === 'string')) {
-            metaProp.setPropertyType(property.type);
-          }
-          metaModelRef!.metaModel.setPropertyField(
-              propName, !!property.id, fieldOpts);
-          mapKeyToColName.set(propName, fieldOpts.name as string);
-        });
-    metaModelRef!.metaModel.init(tableOpts);
+      const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
+      property[this.name].transform = metaProp.transform;
+    });
 
     // indexes:
     if (typeof settings.indexes === 'object') {
@@ -220,10 +189,22 @@ export class MetaModelReader {
             }
             const idxDef = new IDXDefinition(indexName, isUnique);
             Object.keys(keys).forEach((propName) => {
-              const metaProp = metaModel.properties.get(propName);
-              const name = metaProp && metaProp.field.name || propName;
-              idxDef.fields.push(
-                  {name, desc: keys[propName] === -1 ? true : false});
+              const metaProp = metaModel.hasProperty(propName);
+              /* istanbul ignore if */
+              if (!metaProp) {
+                throw new Error(
+                    `property '${
+                                 propName
+                               }' not defined for model '${
+                                                           metaModel.name
+                                                         }' but referenced in index definition '${
+                                                                                                  indexName
+                                                                                                }'`);
+              }
+              idxDef.fields.push({
+                name: metaProp.field.name,
+                desc: keys[propName] === -1 ? true : false
+              });
             });
             table.addIDXDefinition(idxDef);
           }
@@ -238,17 +219,40 @@ export class MetaModelReader {
     Object.keys(foreignKeys)
         .filter((constraintName) => foreignKeys.hasOwnProperty(constraintName))
         .forEach((constraintName) => {
-          const columns: string[] =
-              foreignKeys[constraintName].columns.split(',');
+          const properties: string[] =
+              foreignKeys[constraintName].properties.split(',');
           const refColumns: string[] =
               foreignKeys[constraintName].refColumns.split(',');
           const refTable: string = foreignKeys[constraintName].refTable;
+          if (foreignKeys[constraintName].name) {
+            constraintName = foreignKeys[constraintName].name;
+          }
+          /* istanbul ignore if */
+          if (properties.length !== refColumns.length) {
+            throw new Error(
+                `invalid foreign key definition '${
+                                                   constraintName
+                                                 }': number of items in 'properties' and 'refColumns' must be equal`);
+          }
 
           const fkDef = new FKDefinition(constraintName, refTable);
-          for (let i = 0; i < Math.max(columns.length, refColumns.length);
-               i++) {
+          for (let i = 0; i < refColumns.length; i++) {
+            properties[i] = properties[i].trim();
+            const metaProp = metaModel.hasProperty(properties[i]);
+            /* istanbul ignore if */
+            if (!metaProp) {
+              throw new Error(
+                  `property '${
+                               properties[i]
+                             }' not defined for model '${
+                                                         metaModel.name
+                                                       }' but referenced in foreign key definition '${
+                                                                                                      constraintName
+                                                                                                    }'`);
+            }
+
             fkDef.fields.push({
-              name: columns[i] ? columns[i].trim() : '',
+              name: metaProp.field.name,
               foreignColumnName: refColumns[i] ? refColumns[i].trim() : ''
             });
           }

@@ -56,6 +56,6 @@ declare module 'loopback-connector' {
 
 
     static begin(connector: Connector, options: Object, callback?: Callback):
-        PromiseOrVoid;
+        PromiseOrVoid<Transaction>;
   }
 }

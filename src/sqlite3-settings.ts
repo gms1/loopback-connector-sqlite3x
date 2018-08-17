@@ -1,5 +1,5 @@
-import {SqlDatabaseSettings} from '../../node-sqlite3-orm/dist';
-export {SQL_MEMORY_DB_PRIVATE, SQL_MEMORY_DB_SHARED, SQL_OPEN_CREATE, SQL_OPEN_DEFAULT, SQL_OPEN_READONLY, SQL_OPEN_READWRITE, SqlDatabaseSettings} from '../../node-sqlite3-orm/dist';
+
+import {SqlDatabaseSettings} from 'sqlite3orm';
 
 export interface Sqlite3AllSettings {
   /**
@@ -39,6 +39,12 @@ export interface Sqlite3AllSettings {
    * [dbSettings]
    */
   dbSettings: SqlDatabaseSettings;
+
+  /*
+   * [propertyValueForNULL]
+   */
+  // tslint:disable-next-line no-null-keyword
+  propertyValueForNULL?: null;
 }
 
 export type Sqlite3Settings = Partial<Sqlite3AllSettings>;

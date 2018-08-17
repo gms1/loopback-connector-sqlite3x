@@ -5,15 +5,17 @@ import * as should from 'should';
 
 import {Sqlite3JugglerConnector} from '../../..';
 
-import {getDataSource, initDataSource} from '../core/test-init';
+import {getDataSource, initDataSource, setDefaultConfig} from '../core/test-init';
 
-initDataSource();
 
 describe('loopback-datasource-juggler imported tests', () => {
   let ds: DataSource;
   let connector: Sqlite3JugglerConnector;
 
   before(() => {
+    // tslint:disable-next-line no-null-keyword
+    setDefaultConfig({propertyValueForNULL: null});
+    initDataSource();
     ds = getDataSource();
     should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
     connector = ds.connector as Sqlite3JugglerConnector;
@@ -25,6 +27,7 @@ describe('loopback-datasource-juggler imported tests', () => {
   // ===========================================================
 
   after(async () => {
+    setDefaultConfig({});
     try {
       for (const modelName of connector.modelNames()) {
         await connector.dropTable(modelName);

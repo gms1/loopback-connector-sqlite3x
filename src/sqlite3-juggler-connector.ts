@@ -1,13 +1,12 @@
 // tslint:disable no-implicit-dependencies no-string-literal
 
-import {juggler} from '@loopback/repository';
 import {Callback, DataSource, Filter, PromiseOrVoid, PropertyDefinition, TransactionMixin} from 'loopback-datasource-juggler';
-import {AutoUpgrader, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table} from '../../node-sqlite3-orm/dist';
+import {AutoUpgrader, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table} from 'sqlite3orm';
 
 import {ParameterizedSQL, SQLConnector} from './export-lc';
 import {SQLITE3_CONNECTOR_NAME, Sqlite3Connector} from './sqlite3-connector';
 import {Sqlite3ExecuteOptions} from './sqlite3-options';
-import {Sqlite3Settings} from './sqlite3-settings';
+import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
 import {callbackifyOrPromise} from './utils';
 
 /* istanbul ignore next */
@@ -23,6 +22,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   readonly name: string = SQLITE3_CONNECTOR_NAME;
 
   private connector: Sqlite3Connector;
+  readonly settings: Sqlite3AllSettings;
 
   get pool(): SqlConnectionPool {
     return this.connector.pool;
@@ -31,6 +31,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   constructor(settings: Sqlite3Settings|Object) {
     super(SQLITE3_CONNECTOR_NAME, settings);
     this.connector = new Sqlite3Connector(settings);
+    this.settings = this.connector.settings;
   }
 
   /* istanbul ignore next */
@@ -73,7 +74,8 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   //  Transactions
   // -------------------------------------------------------------------------------------
 
-  beginTransaction(isolationLevel: string, cb?: Callback): PromiseOrVoid;
+  beginTransaction(isolationLevel: string, cb?: Callback):
+      PromiseOrVoid<SqlDatabase>;
   beginTransaction(cb?: Callback): PromiseOrVoid;
   beginTransaction(isolationLevel?: string|Callback, cb?: Callback):
       PromiseOrVoid {
@@ -85,7 +87,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     }
   }
 
-  protected _beginTransaction(cb?: Callback): PromiseOrVoid {
+  protected _beginTransaction(cb?: Callback): PromiseOrVoid<SqlDatabase> {
     return callbackifyOrPromise(this.connector.begin(), cb);
   }
 
@@ -122,13 +124,15 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
         options === undefined) {
       cb = params;
       return this._executeSQL(sql, undefined, undefined, cb);
-    } else /* istanbul ignore if */
-        if (typeof options === 'function' && cb === undefined) {
-      cb = options;
-      return this._executeSQL(sql, params as any[], undefined, cb);
     } else {
-      return this._executeSQL(
-          sql, params as any[], options as Sqlite3ExecuteOptions, cb);
+      /* istanbul ignore if */
+      if (typeof options === 'function' && cb === undefined) {
+        cb = options;
+        return this._executeSQL(sql, params as any[], undefined, cb);
+      } else {
+        return this._executeSQL(
+            sql, params as any[], options as Sqlite3ExecuteOptions, cb);
+      }
     }
   }
 
@@ -163,6 +167,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   getInsertedId(model: string, result?: SqlRunResult): number|undefined {
     // the 'result.lastID' is the last inserted RowId
     const metaModel = this.getMetaModel(model);
+    /* istanbul ignore else */
     if (result && metaModel.table.mapNameToIdentityField.size === 1) {
       const fld = metaModel.table.mapNameToIdentityField.values().next();
       if (fld.value.dbTypeInfo.typeAffinity === 'INTEGER') {
@@ -189,112 +194,27 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     return 'DEFAULT VALUES';
   }
 
-  // tslint:disable cyclomatic-complexity
   fromColumnValue(prop: PropertyDefinition, value: any): any {
-    if (!prop) {
-      return value;
+    /* istanbul ignore else */
+    if (prop && prop[this.name] && prop[this.name].transform &&
+        prop[this.name].transform.fromDB) {
+      const v = prop[this.name].transform.fromDB(
+          value);  // using 'undefined' for NULL
+      return v !== undefined ? v : this.settings.propertyValueForNULL;
     }
-    // tslint:disable triple-equals no-null-keyword
-    if (value == null) {
-      return null;
-    }
-    // tslint:enable triple-equals no-null-keyword
-
-    const type = (prop.type as any).name;
-    // const propertyOpts = (prop[this.name] || {}) as Sqlite3PropertyOptions;
-    switch (type) {
-      case 'Number':
-        return Number(value);
-      case 'String':
-        return String(value);
-      case 'Boolean':
-        /* istanbul ignore if */
-        if (typeof value === 'string') {
-          if (value === '0' || value === 'false') {
-            return false;
-          } else if (value === '1' || value === 'true') {
-            return true;
-          } else {
-            debug(`invalid boolean value '${value}'`);
-            return undefined;
-          }
-        } else {
-          return Boolean(value);
-        }
-      case 'Date':
-        switch (typeof value) {
-          /* istanbul ignore next */
-          case 'string':
-            return new Date(Date.parse(value));
-          case 'number':
-            /* istanbul ignore else */
-            if (Number.isInteger(value)) {
-              // unix time
-              return new Date((value as number) * 1000);
-            } else {
-              // Julian day numbers ?
-              // TODO: convert real-number to Date is currently not supported
-              return NaN;
-            }
-          /* istanbul ignore next */
-          default:
-            // NOTE: should not happen
-            return NaN;
-        }
-
-      case 'Object':
-      case 'Array':
-      case 'List':
-      case 'Point':
-      case 'GeoPoint':
-      case 'ModelConstructor':
-      case 'JSON':
-        return JSON.parse(value);
-
-      default:
-        return JSON.parse(value);
-    }
+    /* istanbul ignore next */
+    throw new Error(`something happened calling fromColumnValue`);
   }
-  // tslint:enable cyclomatic-complexity
 
 
   toColumnValue(prop: PropertyDefinition, value: any): any {
-    if (!prop) {
-      return value;
+    /* istanbul ignore else */
+    if (prop && prop[this.name] && prop[this.name].transform &&
+        prop[this.name].transform.toDB) {
+      return prop[this.name].transform.toDB(value);
     }
-    // tslint:disable-next-line triple-equals
-    if (value == undefined) {
-      // tslint:disable-next-line no-null-keyword
-      return null;
-    }
-    // TODO: here we are assuming that the default datatype mapping is in use!
-    //    Boolean => INTEGER
-    //    Date => INTEGER
-    const type = (prop.type as any).name;
-    // const propertyOpts = (prop[this.name] || {}) as Sqlite3PropertyOptions;
-    switch (type) {
-      case 'Number':
-      case 'String':
-        return value;
-      case 'Boolean':
-        return !value ? 0 : 1;
-      case 'Date':
-        return Math.floor((value as Date).getTime() / 1000);
-
-      case 'JSON':
-        return String(value);
-
-      case 'Object':
-      case 'Array':
-      case 'List':
-      case 'Point':
-      case 'GeoPoint':
-      case 'ModelConstructor':
-        return JSON.stringify(value);
-
-      default:
-        return JSON.stringify(value);
-    }
+    /* istanbul ignore next */
+    throw new Error(`something happened calling toColumnValue`);
   }
 
 
@@ -435,6 +355,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   protected async promisifiedAutoupdate(models?: string[]): Promise<void> {
     try {
       const tables: Table[] = [];
+      /* istanbul ignore else */
       if (models) {
         models.forEach((model) => {
           const metaModel = this.getMetaModel(model, true);
@@ -449,7 +370,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
         await connection.close();
       } catch (_ignore) {
       }
-    } catch (err) {
+    } catch (err) /* istanbul ignore next */ {
       return Promise.reject(err);
     }
   }
@@ -460,9 +381,10 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    * @param [models] - The model name or array of model names
    * @param [cb] - The callback function
    */
-  isActual(models?: string|string[], cb?: Callback): PromiseOrVoid;
-  isActual(cb?: Callback): PromiseOrVoid;
-  isActual(models?: string|string[]|Callback, cb?: Callback): PromiseOrVoid {
+  isActual(models?: string|string[], cb?: Callback): PromiseOrVoid<boolean>;
+  isActual(cb?: Callback): PromiseOrVoid<boolean>;
+  isActual(models?: string|string[]|Callback, cb?: Callback):
+      PromiseOrVoid<boolean> {
     if (!cb && typeof models === 'function') {
       cb = models;
       models = undefined;
@@ -474,13 +396,15 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     return this._isActual(models as string[], cb);
   }
 
-  protected _isActual(models?: string[], cb?: Callback): PromiseOrVoid {
+  protected _isActual(models?: string[], cb?: Callback):
+      PromiseOrVoid<boolean> {
     return callbackifyOrPromise(this.promisifiedIsActual(models), cb);
   }
 
-  protected async promisifiedIsActual(models?: string[]): Promise<void> {
+  protected async promisifiedIsActual(models?: string[]): Promise<boolean> {
     try {
       const tables: Table[] = [];
+      /* istanbul ignore else */
       if (models) {
         models.forEach((model) => {
           const metaModel = this.getMetaModel(model, true);
@@ -490,12 +414,13 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
       const connection = await this.connector.getConnection();
 
       const autoUpgrader = new AutoUpgrader(connection);
-      await autoUpgrader.isActual(tables);
+      const result = await autoUpgrader.isActual(tables);
       try {
         await connection.close();
       } catch (_ignore) {
       }
-    } catch (err) {
+      return result;
+    } catch (err) /* istanbul ignore next */ {
       return Promise.reject(err);
     }
   }

@@ -6,7 +6,6 @@ import * as should from 'should';
 import * as sinon from 'sinon';
 
 import {Sqlite3JugglerConnector} from '../../..';
-
 import {getDataSource, initDataSource} from '../core/test-init';
 
 initDataSource();
@@ -108,7 +107,9 @@ describe('loopback-datasource-juggler sqlite3x', () => {
   it('should support boolean types with null value', (done) => {
     Post.create({title: 'T1', content: 'C1'}, (err: any, p: any) => {
       should.not.exists(err);
+      connector.settings.propertyValueForNULL = null;
       Post.findById(p.id, (err2: any, p2: any) => {
+        connector.settings.propertyValueForNULL = undefined;
         should.not.exists(err2);
         p2.should.have.property('approved', null);
         p2.should.have.property('proofread', null);

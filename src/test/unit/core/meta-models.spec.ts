@@ -2,7 +2,7 @@
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 
-import {MetaModelReader} from '../../../meta-model-reader';
+import {MetaModelFactory} from '../../../meta-model-factory';
 import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 
 // todo: test index definitions using standard, shortened and MySql form
@@ -88,16 +88,15 @@ describe('meta-model (juggler)', () => {
     model1.array = ['a', 'b', 'c'];
 
     const model2 = await model1.save();
-    console.log(`model2: `, JSON.stringify(model2));
 
     const model3 = await testModel.findOne({where: {id: model2.id}});
-    console.log(`model3: `, JSON.stringify(model3));
 
     model3.should.have.property('id', model2.id);
     model3.should.have.property('num', model2.num);
     model3.should.have.property('bool', model2.bool);
     model3.should.have.property('date', model2.date);
     model3.should.have.property('str', model2.str);
+    should.exist(model3.obj);
     model3.obj.should.have.property('street', model2.obj.street);
     model3.obj.should.have.property('city', model2.obj.city);
     model3.obj.should.have.property('state', model2.obj.state);
@@ -247,7 +246,7 @@ describe('meta-model (juggler)', () => {
         sqlite3x: {tableName: 'TEST_TABLE'},
         foreignKeys: {
           fk: {
-            columns: 'C2P1, C2P2',
+            properties: 'parentId1, parentId2',
             refColumns: ' IDP1 , IDP2 ',
             refTable: 'TEST_PARENT_TABLE'
           }
