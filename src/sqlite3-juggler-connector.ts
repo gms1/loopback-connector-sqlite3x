@@ -21,7 +21,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     TransactionMixin {
   readonly name: string = SQLITE3_CONNECTOR_NAME;
 
-  private connector: Sqlite3Connector;
+  private readonly connector: Sqlite3Connector;
   readonly settings: Sqlite3AllSettings;
 
   get pool(): SqlConnectionPool {

@@ -1,5 +1,6 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable no-duplicate-imports
+// tslint:disable await-promise
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 
@@ -34,7 +35,7 @@ describe('loopback-connector connections', () => {
        ds.should.be.equal(connector.dataSource);
 
        try {
-         const p = new Promise((resolve, reject) => {
+         const p = new Promise<void>((resolve, reject) => {
            connector.connect((err: any) => {
              if (err) {
                reject(err);

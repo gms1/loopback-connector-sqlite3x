@@ -1,4 +1,5 @@
 // tslint:disable no-require-imports no-implicit-dependencies
+// tslint:disable await-promise
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 import {SqlDatabase} from 'sqlite3orm';

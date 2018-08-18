@@ -1,4 +1,5 @@
 // tslint:disable no-require-imports no-implicit-dependencies
+// tslint:disable await-promise
 import * as should from 'should';
 
 import {SQL_OPEN_READWRITE, Sqlite3CrudConnector} from '../../..';

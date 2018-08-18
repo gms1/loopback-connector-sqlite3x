@@ -19,9 +19,10 @@ export function callbackify<T>(promise: Promise<T>, cb: Callback<T>): void {
 // if callback then call the callback and return void
 // otherwise return the promise
 export function callbackifyOrPromise<T>(
-    promise: Promise<T>, cb?: Callback<any>): PromiseOrVoid {
+    promise: Promise<T>, cb?: Callback): PromiseOrVoid {
   if (cb) {
     callbackify(promise, cb);
+    // tslint:disable-next-line return-undefined
     return;
   }
   return promise;

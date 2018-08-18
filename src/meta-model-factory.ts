@@ -135,7 +135,7 @@ export class MetaModelFactory {
               propName, !!property.id, fieldOpts);
           mapKeyToColName.set(propName, fieldOpts.name as string);
         });
-    metaModelRef!.metaModel.init(tableOpts);
+    metaModelRef.metaModel.init(tableOpts);
 
     Object.keys(properties).forEach((propName) => {
       const property = properties[propName];
@@ -155,13 +155,13 @@ export class MetaModelFactory {
       this.addForeignKeyDefinitions(metaModelRef, settings.foreignKeys);
     }
 
-    this.mapNameToMetaModel.set(metaModelRef!.metaModel.name, metaModelRef);
-    return metaModelRef!.metaModel;
+    this.mapNameToMetaModel.set(metaModelRef.metaModel.name, metaModelRef);
+    return metaModelRef.metaModel;
   }
 
   protected addIndexDefinitions(metaModelRef: MetaModelRef, indexes: any):
       void {
-    const metaModel = metaModelRef!.metaModel;
+    const metaModel = metaModelRef.metaModel;
     const table = metaModel.table;
     Object.keys(indexes)
         .filter((indexName) => indexes.hasOwnProperty(indexName))
@@ -214,7 +214,7 @@ export class MetaModelFactory {
 
   protected addForeignKeyDefinitions(
       metaModelRef: MetaModelRef, foreignKeys: any): void {
-    const metaModel = metaModelRef!.metaModel;
+    const metaModel = metaModelRef.metaModel;
     const table = metaModel.table;
     Object.keys(foreignKeys)
         .filter((constraintName) => foreignKeys.hasOwnProperty(constraintName))

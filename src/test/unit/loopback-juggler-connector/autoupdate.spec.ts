@@ -1,4 +1,5 @@
 // tslint:disable no-require-imports no-implicit-dependencies no-var-requires
+// tslint:disable await-promise
 
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';

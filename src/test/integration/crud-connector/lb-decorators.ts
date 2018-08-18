@@ -1,6 +1,8 @@
+/* TODO
+
 // tslint:disable no-implicit-dependencies no-non-null-assertion
-import {Class, CrudRepositoryImpl, Entity, model, property} from '@loopback/repository';
-import {expect} from '@loopback/testlab';
+import {Class, CrudRepositoryImpl, Entity, model, property} from
+'@loopback/repository'; import {expect} from '@loopback/testlab';
 
 import {Sqlite3CrudConnector} from '../../../sqlite3-crud-connector';
 
@@ -11,7 +13,6 @@ class Sqlite3CrudRepository<T extends Entity, ID> extends
   }
 }
 
-/* TODO
 
 describe('Sqlite3CrudRepository', () => {
   let ds: Sqlite3CrudConnector;

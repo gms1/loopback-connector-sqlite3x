@@ -3,12 +3,14 @@
 import _sg = require('strong-globalize');
 import {Sqlite3Connector} from './sqlite3-connector';
 import {Sqlite3Settings} from './sqlite3-settings';
-import {CrudConnector, Class, Entity, EntityData, Options, Filter, Where} from '@loopback/repository';
-import {BaseDAO, METADATA_MODEL_KEY, MetaModel} from 'sqlite3orm';
+import {Class, Entity, EntityData, Options, Filter, Where} from '@loopback/repository';
+import {METADATA_MODEL_KEY, MetaModel} from 'sqlite3orm';
 
+// tslint:disable-next-line no-unused-variable
 const g = new _sg();
 
-/* istanbul ignore next */
+
+/* istanbul ignore next */  // tslint:disable-next-line no-unused-variable
 function debug(arg: any, ...args: any[]): void {
   Sqlite3Connector.debug(arg, ...args);
 }
@@ -54,7 +56,6 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    */
   create(modelClass: Class<Entity>, entity: EntityData, options: Options):
       Promise<EntityData> {
-    const metaModel = this.classToMetaModel(modelClass);
     throw new Error('TODO: Not implemented yet.');
   }
 
@@ -68,7 +69,6 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
   createAll(
       modelClass: Class<Entity>, entities: EntityData[],
       options?: Options): Promise<EntityData[]> {
-    // multiple BaseDAO.insert
     throw new Error('TODO: Not implemented yet.');
   }
 

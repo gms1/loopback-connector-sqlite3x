@@ -24,8 +24,6 @@ export class Sqlite3Connector implements Connector {
   readonly pool: SqlConnectionPool;
   readonly metaModels: MetaModelFactory;
 
-  private execCounter: number;
-
   /* istanbul ignore next */
   static get debugEnabled(): boolean {
     return debug.enabled;
@@ -47,7 +45,6 @@ export class Sqlite3Connector implements Connector {
     this.settings = Sqlite3Connector.enrichInputSettings(settings || {});
     this.pool = new SqlConnectionPool();
     this.metaModels = new MetaModelFactory();
-    this.execCounter = 0;
   }
 
   /* istanbul ignore next */
@@ -75,7 +72,7 @@ export class Sqlite3Connector implements Connector {
           this.settings.poolMax, this.settings.dbSettings);
       debug('connected pool');
     } catch (err) {
-      debug('connecting pool failed: ' + err);
+      debug(`connecting pool failed: ${err}`);
       return Promise.reject(err);
     }
   }
@@ -94,7 +91,7 @@ export class Sqlite3Connector implements Connector {
       await this.pool.close();
       debug('disconnected pool');
     } catch (err) /* istanbul ignore next */ {
-      debug('disconnecting pool failed: ' + err);
+      debug(`disconnecting pool failed: ${err}`);
       return Promise.reject(err);
     }
   }
@@ -139,7 +136,7 @@ export class Sqlite3Connector implements Connector {
       await Sqlite3Connector.runDML(connection, `BEGIN DEFERRED TRANSACTION`);
       return connection;
     } catch (err) /* istanbul ignore next */ {
-      debug(`begin transaction failed: ` + err);
+      debug(`begin transaction failed: ${err}`);
       return Promise.reject(err);
     }
   }
@@ -227,7 +224,6 @@ export class Sqlite3Connector implements Connector {
 
   async runSQL(conn: SqlDatabase, sql: string, params?: any[]):
       Promise<any[]|SqlRunResult> {
-    const execCounter = ++this.execCounter;
     try {
       let res: any[]|SqlRunResult;
       const sqlType = sql.trimLeft().substring(0, 6).toUpperCase();

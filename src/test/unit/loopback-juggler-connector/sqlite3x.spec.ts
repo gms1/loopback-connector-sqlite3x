@@ -1,6 +1,6 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable variable-name no-null-keyword
-import {fail} from 'assert';
+// tslint:disable await-promise
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 import * as sinon from 'sinon';

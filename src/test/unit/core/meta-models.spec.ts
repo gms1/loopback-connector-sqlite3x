@@ -1,8 +1,8 @@
 // tslint:disable no-require-imports no-implicit-dependencies
+// tslint:disable await-promise
 import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 
-import {MetaModelFactory} from '../../../meta-model-factory';
 import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 
 // todo: test index definitions using standard, shortened and MySql form
@@ -43,8 +43,6 @@ describe('meta-model (juggler)', () => {
           {street: String, city: String, state: String, zipCode: String}
     };
 
-    const emailSchema = {name: 'Email', properties: {email: String}};
-
     const testSchema = {
       name: 'TestModel',
       options: {idInjection: false, sqlite3x: {tableName: 'TEST_TABLE'}},
@@ -63,8 +61,6 @@ describe('meta-model (juggler)', () => {
         db.modelBuilder.buildModels([addressSchema, testSchema]);
     const testModel: any = models[testSchema.name];
     testModel.attachTo(db);
-    const metaModel = connector.getMetaModel(testSchema.name);
-    const table = metaModel.table;
     try {
       await ds.automigrate(testSchema.name);
     } catch (err) {
@@ -271,8 +267,6 @@ describe('meta-model (juggler)', () => {
     parentTestModel.attachTo(db);
     const testModel: any = models[testSchema.name];
     testModel.attachTo(db);
-    const metaModel = connector.getMetaModel(testSchema.name);
-    const table = metaModel.table;
     /*
     const idxDef = table.getIDXDefinition('testIdx');
     should.exists(idxDef);

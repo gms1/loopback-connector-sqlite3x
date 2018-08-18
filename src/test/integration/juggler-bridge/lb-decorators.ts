@@ -1,5 +1,5 @@
 // tslint:disable no-implicit-dependencies no-non-null-assertion
-// tslint:disable no-duplicate-imports
+// tslint:disable no-duplicate-imports await-promise
 
 // stolen from
 // loopback-next/packages/repository/test/unit/repositories/legacy-juggler-bridge.unit.ts
@@ -38,13 +38,13 @@ describe('DefaultCrudRepository, programmatic ModelDefinition', () => {
     }
   }
 
-  let repo: DefaultCrudRepository<Note, {}>;
+  let repo: DefaultCrudRepository<Note, number>;
 
   beforeEach(async () => {
     ds = new juggler.DataSource(ConnectorModule as any, {name: 'db'});
     connector = ds.connector as Sqlite3JugglerConnector;
     await ds.connect();  // wait until we are connected
-    repo = new DefaultCrudRepository(Note, ds);
+    repo = new DefaultCrudRepository<Note, number>(Note, ds);
     await ds.automigrate('note4');
   });
 
@@ -58,8 +58,8 @@ describe('DefaultCrudRepository, programmatic ModelDefinition', () => {
   });
 
   it('shares the backing PersistedModel across repo instances', async () => {
-    const model1 = new DefaultCrudRepository(Note, ds).modelClass;
-    const model2 = new DefaultCrudRepository(Note, ds).modelClass;
+    const model1 = new DefaultCrudRepository<Note, number>(Note, ds).modelClass;
+    const model2 = new DefaultCrudRepository<Note, number>(Note, ds).modelClass;
 
     expect(model1 === model2).to.be.true();
   });
