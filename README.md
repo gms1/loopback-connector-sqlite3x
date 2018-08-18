@@ -140,7 +140,7 @@ export interface SqlDatabaseSettings {
 
 ## Model definition
 
-You can use the 'sqlite3x' property to specify additional database-specific options to a LoopBack model (see Sqlite3ModelOptions).
+You can use the 'sqlite3x' property to specify additional database-specific options for a LoopBack model (see Sqlite3ModelOptions).
 
 ```TypeScript
 {
@@ -154,7 +154,7 @@ You can use the 'sqlite3x' property to specify additional database-specific opti
 
 ### properties
 
-You can use the 'sqlite3x' property to specify additional database-specific options to a LoopBack property (see Sqlite3PropertyOptions).
+You can use the 'sqlite3x' property to specify additional database-specific options for a LoopBack property (see Sqlite3PropertyOptions).
 
 ```TypeScript
 {
