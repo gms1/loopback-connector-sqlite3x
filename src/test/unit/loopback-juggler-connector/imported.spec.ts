@@ -16,6 +16,12 @@ describe('loopback-datasource-juggler imported tests', () => {
   before(() => {
     // tslint:disable-next-line no-null-keyword
     setDefaultConfig({propertyValueForNULL: null});
+    // NOTE: these tests would fail without setting propertyValueForNULL to null:
+    //  .) datatypes/model option persistUndefinedAsNull/should convert undefined to null on save
+    //  .) relations/embedsOne/should get an embedded item on scope - verify
+    //  .) relations/embedsOne/should get an embedded item on scope with promises - verify
+    //  .) relations/embedsOne/should delete the embedded document and also update parent
+
     initDataSource();
     ds = getDataSource();
     should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
