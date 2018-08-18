@@ -17,11 +17,3 @@ There are multiple ways you can define a model including a JSON file similar to 
 
 [LoopBack 4 Todo tutorial](https://github.com/strongloop/loopback-next/blob/master/examples/todo/README.md)
 
-##  **loopback-connector-sqlite3** compatibility
-
-Dates are stored differently to INTEGER. TODO: implement a setting e.g. 'DateInMs' to store dates in millisecond units instead of seconds
-
-## **sqlite3orm**
-
-automigrate/autoupdate: the loopback-connector needs the full definition for referenced tables/indexes/foreign keys
-
