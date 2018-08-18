@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.0.1
+## 1.0.0-beta.0
 
 * **Features**
-  * initial release UNDER CONSTRUCTION
+  * initial release
