@@ -4,7 +4,7 @@ import * as should from 'should';
 import {SqlDatabase} from 'sqlite3orm';
 
 import {Sqlite3JugglerConnector} from '../../..';
-import {Transaction} from '../../../export-lc';
+import {Transaction} from '../../../lc-import';
 import {initDataSource} from '../core/test-init';
 
 

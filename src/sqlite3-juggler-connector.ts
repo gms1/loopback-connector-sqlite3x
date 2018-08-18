@@ -3,7 +3,7 @@
 import {Callback, DataSource, Filter, PromiseOrVoid, PropertyDefinition, TransactionMixin} from 'loopback-datasource-juggler';
 import {AutoUpgrader, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table} from 'sqlite3orm';
 
-import {ParameterizedSQL, SQLConnector} from './export-lc';
+import {ParameterizedSQL, SQLConnector} from './lc-import';
 import {SQLITE3_CONNECTOR_NAME, Sqlite3Connector} from './sqlite3-connector';
 import {Sqlite3ExecuteOptions} from './sqlite3-options';
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
