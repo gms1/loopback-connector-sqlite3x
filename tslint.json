@@ -127,7 +127,7 @@
     "object-literal-sort-keys": false,
     "prefer-const": true,
 
-    "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+    "trailing-comma": [false, {"multiline": "never", "singleline": "never"}],
 
     "align": [true],
     "array-type": [false],

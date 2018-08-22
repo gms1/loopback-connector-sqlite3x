@@ -39,8 +39,12 @@ describe('meta-model (juggler)', () => {
   it('default type mapping', async () => {
     const addressSchema = {
       name: 'Address',
-      properties:
-          {street: String, city: String, state: String, zipCode: String}
+      properties: {
+        street: String,
+        city: String,
+        state: String,
+        zipCode: String,
+      }
     };
 
     const testSchema = {
@@ -57,8 +61,7 @@ describe('meta-model (juggler)', () => {
       }
     };
 
-    const models: any =
-        db.modelBuilder.buildModels([addressSchema, testSchema]);
+    const models: any = db.modelBuilder.buildModels([addressSchema, testSchema]);
     const testModel: any = models[testSchema.name];
     testModel.attachTo(db);
     try {
@@ -79,7 +82,7 @@ describe('meta-model (juggler)', () => {
       street: 'my street',
       city: 'my city',
       state: 'my state',
-      zipCode: 'my zipcode'
+      zipCode: 'my zipcode',
     };
     model1.array = ['a', 'b', 'c'];
 
@@ -114,7 +117,10 @@ describe('meta-model (juggler)', () => {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
+          sqlite3x: {
+            columnName: 'ID',
+            dbtype: 'INTEGER NOT NULL',
+          }
         },
         col1: {type: 'String'},
         col2: {type: 'String'}
@@ -146,13 +152,13 @@ describe('meta-model (juggler)', () => {
       options: {
         idInjection: false,
         sqlite3x: {tableName: 'TEST_TABLE'},
-        indexes: {testIdx: {col1: 1, col2: -1}}
+        indexes: {testIdx: {col1: 1, col2: -1}},
       },
       properties: {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
+          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'},
         },
         col1: {type: 'String'},
         col2: {type: 'String'}
@@ -190,7 +196,7 @@ describe('meta-model (juggler)', () => {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
+          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'},
         },
         col1: {type: 'String'},
         col2: {type: 'String'}
@@ -225,12 +231,12 @@ describe('meta-model (juggler)', () => {
         id1: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'IDP1', dbtype: 'INTEGER NOT NULL'}
+          sqlite3x: {columnName: 'IDP1', dbtype: 'INTEGER NOT NULL'},
         },
         id2: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'IDP2', dbtype: 'INTEGER NOT NULL'}
+          sqlite3x: {columnName: 'IDP2', dbtype: 'INTEGER NOT NULL'},
         }
       }
 
@@ -240,25 +246,23 @@ describe('meta-model (juggler)', () => {
       options: {
         idInjection: false,
         sqlite3x: {tableName: 'TEST_TABLE'},
-        foreignKeys: {
-          fk: {
-            properties: 'parentId1, parentId2',
-            refColumns: ' IDP1 , IDP2 ',
-            refTable: 'TEST_PARENT_TABLE'
-          }
-        }
+        foreignKeys:
+            {fk: {properties: 'parentId1, parentId2', refColumns: ' IDP1 , IDP2 ', refTable: 'TEST_PARENT_TABLE'}}
       },
       properties: {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'IDC', dbtype: 'INTEGER NOT NULL'}
+          sqlite3x: {columnName: 'IDC', dbtype: 'INTEGER NOT NULL'},
         },
-        parentId1:
-            {type: 'Number', sqlite3x: {columnName: 'C2P1', dbtype: 'INTEGER'}},
-        parentId2:
-            {type: 'Number', sqlite3x: {columnName: 'C2P2', dbtype: 'INTEGER'}}
-
+        parentId1: {
+          type: 'Number',
+          sqlite3x: {columnName: 'C2P1', dbtype: 'INTEGER'},
+        },
+        parentId2: {
+          type: 'Number',
+          sqlite3x: {columnName: 'C2P2', dbtype: 'INTEGER'},
+        }
       }
     };
 

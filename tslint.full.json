@@ -155,7 +155,7 @@
     "prefer-const": true,
     "prefer-readonly": true,
     "trailing-comma": [
-      true,
+      false,
       {
         "multiline": "never",
         "singleline": "never"

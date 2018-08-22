@@ -18,25 +18,21 @@ describe('loopback-datasource-juggler autoupdate', () => {
     name: 'AutoUpdate',
     options: {idInjection: false, sqlite3x: {tableName: 'AUTOUPDATE'}},
     properties: {
-      id: {
-        type: 'Number',
-        id: 1,
-        sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
-      },
-      col1: {type: 'String'}
+      id: {type: 'Number', id: 1, sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}},
+      col1: {type: 'String', sqlite3x: {columnName: 'COL1', dbtype: 'TEXT'}}
     }
   };
 
   const autoupdateSchemaV2 = {
     name: 'AutoUpdate',
-    options: {idInjection: false, sqlite3x: {tableName: 'AUTOUPDATE'}},
+    options: {
+      idInjection: false,
+      sqlite3x: {tableName: 'AUTOUPDATE'},
+      indexes: {IDXAUTOUPDATE: {keys: {col1: -1, col2: 1}, options: {unique: false}}}
+    },
     properties: {
-      id: {
-        type: 'Number',
-        id: 1,
-        sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
-      },
-      col1: {type: 'String'},
+      id: {type: 'Number', id: 1, sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}},
+      col1: {type: 'String', sqlite3x: {columnName: 'COL1', dbtype: 'TEXT'}},
       col2: {type: 'String'}
     }
   };
@@ -68,6 +64,16 @@ describe('loopback-datasource-juggler autoupdate', () => {
     await connector.autoupdate(autoupdateSchemaV2.name);
     const isActualV2R2 = await connector.isActual(autoupdateSchemaV2.name);
     (isActualV2R2 as boolean).should.be.true();
+
+
+    const metaModel = connector.getMetaModel(autoupdateSchemaV2.name);
+    const table = metaModel.table;
+    const idxDef = table.getIDXDefinition('IDXAUTOUPDATE');
+    should.exists(idxDef);
+    idxDef.should.have.property('name', 'IDXAUTOUPDATE');
+    idxDef.should.have.property('isUnique', false);
+    idxDef.should.have.property('id', 'IDXAUTOUPDATE(COL1 DESC,col2)');
+
   });
 
 

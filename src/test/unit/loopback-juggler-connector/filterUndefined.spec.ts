@@ -16,16 +16,10 @@ describe('loopback-datasource-juggler filter undefined fields', () => {
 
   const postFilterUndefinedSchema = {
     name: 'PostFilterUndefined',
-    options:
-        {idInjection: false, sqlite3x: {tableName: 'POST_FILTER_UNDEFINED'}},
+    options: {idInjection: false, sqlite3x: {tableName: 'POST_FILTER_UNDEFINED'}},
     properties: {
-      id: {
-        type: 'Number',
-        id: 1,
-        sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
-      },
-      defaultInt:
-          {type: 'Number', sqlite3x: {dbtype: 'INTEGER NOT NULL DEFAULT 5'}},
+      id: {type: 'Number', id: 1, sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}},
+      defaultInt: {type: 'Number', sqlite3x: {dbtype: 'INTEGER NOT NULL DEFAULT 5'}},
       first: {type: 'String'},
       second: {type: 'Number', sqlite3x: {dbtype: 'REAL'}},
       third: {type: 'Number', sqlite3x: {dbtype: 'REAL'}}
@@ -113,24 +107,23 @@ describe('loopback-datasource-juggler filter undefined fields', () => {
        });
      });
 
-  it('should update \'third\' field of record with id==2 to null value',
-     (done) => {
-       Post.findOne({where: {id: 2}}, (err: any, p: any) => {
-         should.not.exist(err);
-         should.exist(p);
-         p.id.should.be.equal(2);
-         p.updateAttributes({first: 'null in third', third: null}, () => {
-           Post.findOne({where: {id: 2}}, (err2: any, p2: any) => {
-             should.not.exist(err2);
-             p2.defaultInt.should.be.equal(5);
-             p2.first.should.be.equal('null in third');
-             should.not.exist(p2.second);
-             should.not.exist(p2.third);
-             done();
-           });
-         });
-       });
-     });
+  it('should update \'third\' field of record with id==2 to null value', (done) => {
+    Post.findOne({where: {id: 2}}, (err: any, p: any) => {
+      should.not.exist(err);
+      should.exist(p);
+      p.id.should.be.equal(2);
+      p.updateAttributes({first: 'null in third', third: null}, () => {
+        Post.findOne({where: {id: 2}}, (err2: any, p2: any) => {
+          should.not.exist(err2);
+          p2.defaultInt.should.be.equal(5);
+          p2.first.should.be.equal('null in third');
+          should.not.exist(p2.second);
+          should.not.exist(p2.third);
+          done();
+        });
+      });
+    });
+  });
 
   it('should insert a value into \'defaultInt\' and \'second\'', (done) => {
     const dflPost = new Post();
