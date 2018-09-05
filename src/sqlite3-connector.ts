@@ -293,7 +293,7 @@ export class Sqlite3Connector implements Connector {
     }
     /* istanbul ignore else */
     if (!connectorSettings.dbSettings.busyTimeout) {
-      connectorSettings.dbSettings.busyTimeout = 3000;
+      connectorSettings.dbSettings.busyTimeout = 6000;
     }
     /* istanbul ignore else */
     if (!connectorSettings.dbSettings.readUncommitted) {

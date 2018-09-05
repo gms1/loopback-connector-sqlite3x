@@ -14,12 +14,12 @@ alternative and unofficial LoopBack connector for SQLite3.
 
 * auto-migrate and auto-update for tables, indexes, foreign keys
 * connection pool
-* full control over the names for tables, fields and foreign key constraints in the mapped database schema
+* full control over the names for tables, fields, indexes and foreign key constraints in the mapped database schema
 
 ### TODO
 
 * discovering models
-* LB4 CrudConnector, but only if we gain any advantage
+* LB4 CrudConnector (if we gain any advantage)
   
 ## Installation
 
