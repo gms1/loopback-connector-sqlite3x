@@ -67,7 +67,7 @@
     "debug": "^3.1.0",
     "loopback-connector": "^4.5.1",
     "loopback-datasource-juggler": "^3.23.0",
-    "sqlite3orm": "^2.3.2",
+    "sqlite3orm": "^2.4.0",
     "strong-globalize": "^4.1.1"
   },
   "devDependencies": {
@@ -86,7 +86,7 @@
     "nyc": "^13.0.1",
     "rimraf": "^2.6.2",
     "should": "^13.2.3",
-    "sinon": "^6.1.5",
+    "sinon": "^6.2.0",
     "source-map-support": "^0.5.9",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
