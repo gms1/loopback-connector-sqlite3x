@@ -64,7 +64,6 @@
     "all": true
   },
   "dependencies": {
-    "@loopback/repository": "^0.15.1",
     "debug": "^3.1.0",
     "loopback-connector": "^4.5.1",
     "loopback-datasource-juggler": "^3.23.0",
@@ -72,6 +71,7 @@
     "strong-globalize": "^4.1.1"
   },
   "devDependencies": {
+    "@loopback/repository": "^0.15.1",
     "@loopback/testlab": "^0.11.5",
     "@types/debug": "^0.0.30",
     "@types/mocha": "^5.2.5",

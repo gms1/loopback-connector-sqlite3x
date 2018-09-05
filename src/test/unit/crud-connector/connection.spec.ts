@@ -2,7 +2,8 @@
 // tslint:disable await-promise
 import * as should from 'should';
 
-import {SQL_OPEN_READWRITE, Sqlite3CrudConnector} from '../../..';
+import {SQL_OPEN_READWRITE} from '../../..';
+import {Sqlite3CrudConnector} from '../../../sqlite3-crud-connector';
 
 
 describe('crud-connector connections', () => {
@@ -30,8 +31,7 @@ describe('crud-connector connections', () => {
   });
 
   it('should fail to connect to wrong db file', async () => {
-    const connector = new Sqlite3CrudConnector(
-        {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
+    const connector = new Sqlite3CrudConnector({file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
     try {
       await connector.connect();
       should.should.fail();

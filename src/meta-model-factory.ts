@@ -1,5 +1,5 @@
 // tslint:disable no-non-null-assertion
-import {ModelDefinition} from '@loopback/repository';
+// import {ModelDefinition} from '@loopback/repository';
 import * as juggler from 'loopback-datasource-juggler';
 import {FieldOpts, FKDefinition, IDXDefinition, MetaModel, PropertyType, TableOpts} from 'sqlite3orm';
 
@@ -12,7 +12,7 @@ function debug(arg: any, ...args: any[]): void {
 
 interface MetaModelRef {
   metaModel: MetaModel;
-  lbModelDef?: juggler.ModelDefinition|ModelDefinition;
+  lbModelDef?: juggler.ModelDefinition;  // |ModelDefinition;
 }
 
 
@@ -56,10 +56,11 @@ export class MetaModelFactory {
    */
 
   // TODO: getMetaModel for the CRUDConnector is not implemented yet
-  /* istanbul ignore next */
+  /*
   getMetaModel(modelName: string, lbModelDef: ModelDefinition, recreate?: boolean): MetaModel {
     throw new Error(`getMetaModel is not implemented yet`);
   }
+  */
 
   /**
    * get a MetaModel for a juggler model definition
@@ -93,6 +94,8 @@ export class MetaModelFactory {
 
 
       if (property.id && property.generated) {
+        // may be set to false later on, if the type for this property is not integer
+        // or table has a combined id
         tableOpts.autoIncrement = true;
       }
       const propertyOpts = (property[this.name] || {}) as Sqlite3PropertyOptions;

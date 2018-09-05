@@ -1,9 +1,16 @@
 
-// tslint:disable no-require-imports member-ordering
-import {Connector, ModelDefinition} from '@loopback/repository';
+// tslint:disable no-require-imports member-ordering no-implicit-dependencies
+import {Connector} from '@loopback/repository';
 import _sg = require('strong-globalize');
 import * as _dbg from 'debug';
-import {SqlConnectionPool, SqlDatabase, SqlRunResult, SQL_MEMORY_DB_SHARED, SQL_OPEN_DEFAULT, MetaModel} from 'sqlite3orm';
+import {
+  SqlConnectionPool,
+  SqlDatabase,
+  SqlRunResult,
+  SQL_MEMORY_DB_SHARED,
+  SQL_OPEN_DEFAULT,
+  MetaModel
+} from 'sqlite3orm';
 
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
 import {MetaModelFactory} from './meta-model-factory';
@@ -11,8 +18,7 @@ import {MetaModelFactory} from './meta-model-factory';
 const g = new _sg();
 
 export const SQLITE3_CONNECTOR_NAME = 'sqlite3x';
-const SQLITE3_CONNECTOR_DESCRIPTION =
-    g.f('unofficial LoopBack connector for SQLite3');
+const SQLITE3_CONNECTOR_DESCRIPTION = g.f('unofficial LoopBack connector for SQLite3');
 
 const debug = _dbg('loopback:connector:sqlite3x');
 
@@ -68,8 +74,8 @@ export class Sqlite3Connector implements Connector {
     try {
       debug('connecting pool...');
       await this.pool.open(
-          this.settings.file, this.settings.mode, this.settings.poolMin,
-          this.settings.poolMax, this.settings.dbSettings);
+          this.settings.file, this.settings.mode, this.settings.poolMin, this.settings.poolMax,
+          this.settings.dbSettings);
       debug('connected pool');
     } catch (err) {
       debug(`connecting pool failed: ${err}`);
@@ -206,13 +212,11 @@ export class Sqlite3Connector implements Connector {
     }
   }
 
-  static runDQL(conn: SqlDatabase, sql: string, params?: any[]):
-      Promise<any[]> {
+  static runDQL(conn: SqlDatabase, sql: string, params?: any[]): Promise<any[]> {
     return conn.all(sql, params);
   }
 
-  static runDML(conn: SqlDatabase, sql: string, params?: any[]):
-      Promise<SqlRunResult> {
+  static runDML(conn: SqlDatabase, sql: string, params?: any[]): Promise<SqlRunResult> {
     return conn.run(sql, params).catch((err) => {
       if (err && err.message.match(/UNIQUE constraint failed/i)) {
         err.message = `DUPLICATE: ${err.message}`;
@@ -222,8 +226,7 @@ export class Sqlite3Connector implements Connector {
   }
 
 
-  async runSQL(conn: SqlDatabase, sql: string, params?: any[]):
-      Promise<any[]|SqlRunResult> {
+  async runSQL(conn: SqlDatabase, sql: string, params?: any[]): Promise<any[]|SqlRunResult> {
     try {
       let res: any[]|SqlRunResult;
       const sqlType = sql.trimLeft().substring(0, 6).toUpperCase();
@@ -243,18 +246,15 @@ export class Sqlite3Connector implements Connector {
   // model definitions
   // -------------------------------------------------------------------------------------
 
-  /* istanbul ignore next */
-  getMetaModel(
-      modelName: string, lbModelDef: ModelDefinition,
-      recreate?: boolean): MetaModel {
+  /*
+  getMetaModel(modelName: string, lbModelDef: ModelDefinition, recreate?: boolean): MetaModel {
     throw new Error(`not implemented yet`);
     // return this.metaModels.getMetaModel(modelName, lbModelDef, recreate);
   }
+  */
 
-  getMetaModelFromJuggler(
-      modelName: string, lbModelDef: any, recreate?: boolean): MetaModel {
-    return this.metaModels.getMetaModelFromJuggler(
-        modelName, lbModelDef, recreate);
+  getMetaModelFromJuggler(modelName: string, lbModelDef: any, recreate?: boolean): MetaModel {
+    return this.metaModels.getMetaModelFromJuggler(modelName, lbModelDef, recreate);
   }
 
   destroyMetaModel(modelName: string): void {
@@ -273,16 +273,14 @@ export class Sqlite3Connector implements Connector {
   // settings
   // -------------------------------------------------------------------------------------
 
-  static enrichInputSettings(inputSettings: Sqlite3Settings|
-                             Object): Sqlite3AllSettings {
+  static enrichInputSettings(inputSettings: Sqlite3Settings|Object): Sqlite3AllSettings {
     const connectorSettings: Sqlite3Settings = Object.assign({}, inputSettings);
 
     connectorSettings.file = connectorSettings.file || SQL_MEMORY_DB_SHARED;
     connectorSettings.mode = connectorSettings.mode || SQL_OPEN_DEFAULT;
     connectorSettings.poolMin = connectorSettings.poolMin || 1;
     // tslint:disable triple-equals
-    connectorSettings.poolMax =
-        connectorSettings.poolMax == undefined ? 0 : connectorSettings.poolMax;
+    connectorSettings.poolMax = connectorSettings.poolMax == undefined ? 0 : connectorSettings.poolMax;
     connectorSettings.schemaName = connectorSettings.schemaName || 'main';
     connectorSettings.debug = Sqlite3Connector.debugEnabled;
     /* istanbul ignore else */

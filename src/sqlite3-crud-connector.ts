@@ -1,10 +1,10 @@
 
-// tslint:disable no-require-imports member-ordering
+// tslint:disable no-require-imports member-ordering no-implicit-dependencies
 import _sg = require('strong-globalize');
 import {Sqlite3Connector} from './sqlite3-connector';
 import {Sqlite3Settings} from './sqlite3-settings';
 import {Class, Entity, EntityData, Options, Filter, Where} from '@loopback/repository';
-import {METADATA_MODEL_KEY, MetaModel} from 'sqlite3orm';
+// import {METADATA_MODEL_KEY, MetaModel} from 'sqlite3orm';
 
 // tslint:disable-next-line no-unused-variable
 const g = new _sg();
@@ -31,6 +31,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
     super(settings);
   }
 
+  /*
   public classToMetaModel(modelClass: Class<Entity>): MetaModel {
     let metaModel =
         Reflect.getMetadata(METADATA_MODEL_KEY, modelClass.prototype);
@@ -40,6 +41,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
     }
     return metaModel;
   }
+  */
 
 
   /*************************************************************************************
@@ -54,8 +56,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of the entity created
    */
-  create(modelClass: Class<Entity>, entity: EntityData, options: Options):
-      Promise<EntityData> {
+  create(modelClass: Class<Entity>, entity: EntityData, options: Options): Promise<EntityData> {
     throw new Error('TODO: Not implemented yet.');
   }
 
@@ -66,9 +67,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of an array of entities created
    */
-  createAll(
-      modelClass: Class<Entity>, entities: EntityData[],
-      options?: Options): Promise<EntityData[]> {
+  createAll(modelClass: Class<Entity>, entities: EntityData[], options?: Options): Promise<EntityData[]> {
     throw new Error('TODO: Not implemented yet.');
   }
 
@@ -79,8 +78,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of the entity saved
    */
-  save(modelClass: Class<Entity>, entity: EntityData, options?: Options):
-      Promise<EntityData> {
+  save(modelClass: Class<Entity>, entity: EntityData, options?: Options): Promise<EntityData> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -90,8 +88,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of an array of entities found for the filter
    */
-  find(modelClass: Class<Entity>, filter?: Filter, options?: Options):
-      Promise<EntityData[]> {
+  find(modelClass: Class<Entity>, filter?: Filter, options?: Options): Promise<EntityData[]> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -101,8 +98,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of the entity found for the id
    */
-  findById<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
-      Promise<EntityData> {
+  findById<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options): Promise<EntityData> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -113,8 +109,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @returns Promise<true> if an entity is updated, otherwise
    * Promise<false>
    */
-  update(modelClass: Class<Entity>, entity: EntityData, options?: Options):
-      Promise<boolean> {
+  update(modelClass: Class<Entity>, entity: EntityData, options?: Options): Promise<boolean> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -125,8 +120,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @returns Promise<true> if an entity is deleted, otherwise
    * Promise<false>
    */
-  delete(modelClass: Class<Entity>, entity: EntityData, options?: Options):
-      Promise<boolean> {
+  delete(modelClass: Class<Entity>, entity: EntityData, options?: Options): Promise<boolean> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -137,9 +131,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of number of matching entities deleted
    */
-  updateAll(
-      modelClass: Class<Entity>, data: EntityData, where?: Where,
-      options?: Options): Promise<number> {
+  updateAll(modelClass: Class<Entity>, data: EntityData, where?: Where, options?: Options): Promise<number> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -151,9 +143,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @returns Promise<true> if an entity is updated for the id, otherwise
    * Promise<false>
    */
-  updateById<IdType>(
-      modelClass: Class<Entity>, id: IdType, data: EntityData,
-      options?: Options): Promise<boolean> {
+  updateById<IdType>(modelClass: Class<Entity>, id: IdType, data: EntityData, options?: Options): Promise<boolean> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -165,9 +155,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @returns Promise<true> if an entity is replaced for the id, otherwise
    * Promise<false>
    */
-  replaceById<IdType>(
-      modelClass: Class<Entity>, id: IdType, data: EntityData,
-      options?: Options): Promise<boolean> {
+  replaceById<IdType>(modelClass: Class<Entity>, id: IdType, data: EntityData, options?: Options): Promise<boolean> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -177,8 +165,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of number of matching entities deleted
    */
-  deleteAll(modelClass: Class<Entity>, where?: Where, options?: Options):
-      Promise<number> {
+  deleteAll(modelClass: Class<Entity>, where?: Where, options?: Options): Promise<number> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -189,8 +176,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @returns Promise<true> if an entity is deleted for the id, otherwise
    * Promise<false>
    */
-  deleteById<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
-      Promise<boolean> {
+  deleteById<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options): Promise<boolean> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -200,8 +186,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @param options Options for the operation
    * @returns A promise of number of matching entities
    */
-  count(modelClass: Class<Entity>, where?: Where, options?: Options):
-      Promise<number> {
+  count(modelClass: Class<Entity>, where?: Where, options?: Options): Promise<number> {
     throw new Error('TODO: Not implemented yet.');
   }
   /**
@@ -212,8 +197,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    * @returns Promise<true> if an entity exists for the id, otherwise
    * Promise<false>
    */
-  exists<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options):
-      Promise<boolean> {
+  exists<IdType>(modelClass: Class<Entity>, id: IdType, options?: Options): Promise<boolean> {
     throw new Error('TODO: Not implemented yet.');
   }
 }
