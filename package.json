@@ -64,7 +64,7 @@
     "all": true
   },
   "dependencies": {
-    "debug": "^3.1.0",
+    "debug": "^4.0.0",
     "loopback-connector": "^4.5.1",
     "loopback-datasource-juggler": "^3.23.0",
     "sqlite3orm": "^2.4.0",
