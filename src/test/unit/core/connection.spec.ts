@@ -31,8 +31,7 @@ describe('crud-connector connections', () => {
   });
 
   it('should fail to connect to wrong db file', async () => {
-    const connector = new Sqlite3Connector(
-        {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
+    const connector = new Sqlite3Connector({file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
     try {
       await connector.connect();
       should.should.fail();
@@ -60,8 +59,7 @@ describe('crud-connector connections', () => {
     should(connector.pool.isOpen()).be.true();
     const connection = await connector.getConnection();
     try {
-      await connector.runSQL(
-          connection, 'insert into DOESNOTEXIST (id, col) values (1, 42)');
+      await connector.runSQL(connection, 'insert into DOESNOTEXIST (id, col) values (1, 42)');
       should.should.fail();
     } catch (err) {
     }

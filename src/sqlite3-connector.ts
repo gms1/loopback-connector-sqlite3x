@@ -24,7 +24,7 @@ const debug = _dbg('loopback:connector:sqlite3x');
 
 
 export class Sqlite3Connector implements Connector {
-  name: string = SQLITE3_CONNECTOR_NAME;
+  readonly name: string = SQLITE3_CONNECTOR_NAME;
 
   readonly settings: Sqlite3AllSettings;
   readonly pool: SqlConnectionPool;
@@ -40,17 +40,19 @@ export class Sqlite3Connector implements Connector {
     debug.enabled = enabled;
   }
 
-  constructor(settings?: Sqlite3Settings|Object) {
+  constructor(settings?: Sqlite3Settings) {
+    this.settings = Sqlite3Connector.enrichInputSettings(settings || {});
     /* istanbul ignore if */
     if (Sqlite3Connector.debugEnabled) {
       debug(`${SQLITE3_CONNECTOR_NAME}`);
       debug(`  ${SQLITE3_CONNECTOR_DESCRIPTION}`);
+      debug(`  datasource: '${this.settings.name}'`);
       debug(`  settings: %j`, settings);
       SqlDatabase.verbose();
     }
-    this.settings = Sqlite3Connector.enrichInputSettings(settings || {});
     this.pool = new SqlConnectionPool();
     this.metaModels = new MetaModelFactory();
+    Sqlite3Connector.connectors.add(this);
   }
 
   /* istanbul ignore next */
@@ -306,4 +308,6 @@ export class Sqlite3Connector implements Connector {
 
     return connectorSettings as Sqlite3AllSettings;
   }
+
+  static connectors: WeakSet<Sqlite3Connector> = new WeakSet<Sqlite3Connector>();
 }

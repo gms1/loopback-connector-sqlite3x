@@ -27,7 +27,7 @@ export class Sqlite3CrudConnector extends Sqlite3Connector /* implements
    */
   interfaces?: string[];
 
-  constructor(settings?: Sqlite3Settings|Object) {
+  constructor(settings?: Sqlite3Settings) {
     super(settings);
   }
 

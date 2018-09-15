@@ -1,6 +1,13 @@
 // tslint:disable no-implicit-dependencies no-string-literal
 
-import {Callback, DataSource, Filter, PromiseOrVoid, PropertyDefinition, TransactionMixin} from 'loopback-datasource-juggler';
+import {
+  Callback,
+  DataSource,
+  Filter,
+  PromiseOrVoid,
+  PropertyDefinition,
+  TransactionMixin
+} from 'loopback-datasource-juggler';
 import {AutoUpgrader, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table} from 'sqlite3orm';
 
 import {ParameterizedSQL, SQLConnector} from './lc-import';
@@ -17,8 +24,7 @@ function debug(arg: any, ...args: any[]): void {
 /*
  * wrapper class around Sqlite3CrudConnector to make juggler happy
  */
-export class Sqlite3JugglerConnector extends SQLConnector implements
-    TransactionMixin {
+export class Sqlite3JugglerConnector extends SQLConnector implements TransactionMixin {
   readonly name: string = SQLITE3_CONNECTOR_NAME;
 
   private readonly connector: Sqlite3Connector;
@@ -28,8 +34,8 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     return this.connector.pool;
   }
 
-  constructor(settings: Sqlite3Settings|Object) {
-    super(SQLITE3_CONNECTOR_NAME, settings);
+  constructor(settings: Sqlite3Settings) {
+    super(SQLITE3_CONNECTOR_NAME);
     this.connector = new Sqlite3Connector(settings);
     this.settings = this.connector.settings;
   }
@@ -74,11 +80,9 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   //  Transactions
   // -------------------------------------------------------------------------------------
 
-  beginTransaction(isolationLevel: string, cb?: Callback):
-      PromiseOrVoid<SqlDatabase>;
+  beginTransaction(isolationLevel: string, cb?: Callback): PromiseOrVoid<SqlDatabase>;
   beginTransaction(cb?: Callback): PromiseOrVoid;
-  beginTransaction(isolationLevel?: string|Callback, cb?: Callback):
-      PromiseOrVoid {
+  beginTransaction(isolationLevel?: string|Callback, cb?: Callback): PromiseOrVoid {
     /* istanbul ignore if */
     if (typeof isolationLevel === 'function' && cb === undefined) {
       return this._beginTransaction(isolationLevel);
@@ -111,17 +115,13 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    * @param [options] Options object
    * @callback [callback] The callback function
    */
-  executeSQL(
-      sql: string, params?: any[], options?: Sqlite3ExecuteOptions,
-      cb?: Callback): PromiseOrVoid;
+  executeSQL(sql: string, params?: any[], options?: Sqlite3ExecuteOptions, cb?: Callback): PromiseOrVoid;
   executeSQL(sql: string, params?: any[], cb?: Callback): PromiseOrVoid;
   executeSQL(sql: string, cb?: Callback): PromiseOrVoid;
-  executeSQL(
-      sql: string, params?: any[]|Callback,
-      options?: Sqlite3ExecuteOptions|Callback, cb?: Callback): PromiseOrVoid {
+  executeSQL(sql: string, params?: any[]|Callback, options?: Sqlite3ExecuteOptions|Callback, cb?: Callback):
+      PromiseOrVoid {
     /* istanbul ignore if */
-    if (typeof params === 'function' && cb === undefined &&
-        options === undefined) {
+    if (typeof params === 'function' && cb === undefined && options === undefined) {
       cb = params;
       return this._executeSQL(sql, undefined, undefined, cb);
     } else {
@@ -130,29 +130,23 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
         cb = options;
         return this._executeSQL(sql, params as any[], undefined, cb);
       } else {
-        return this._executeSQL(
-            sql, params as any[], options as Sqlite3ExecuteOptions, cb);
+        return this._executeSQL(sql, params as any[], options as Sqlite3ExecuteOptions, cb);
       }
     }
   }
 
-  protected _executeSQL(
-      sql: string, params?: any[], options?: Sqlite3ExecuteOptions,
-      cb?: Callback): PromiseOrVoid {
-    return callbackifyOrPromise(
-        this.promisifiedExecuteSql(sql, params, options), cb);
+  protected _executeSQL(sql: string, params?: any[], options?: Sqlite3ExecuteOptions, cb?: Callback): PromiseOrVoid {
+    return callbackifyOrPromise(this.promisifiedExecuteSql(sql, params, options), cb);
   }
 
-  public async promisifiedExecuteSql(
-      sql: string, params?: any[],
-      options?: Sqlite3ExecuteOptions): Promise<any[]|SqlRunResult> {
+  public async promisifiedExecuteSql(sql: string, params?: any[], options?: Sqlite3ExecuteOptions):
+      Promise<any[]|SqlRunResult> {
     params = params || [];
     options = options || {};
     let res: any[]|SqlRunResult;
     try {
       const transaction = options && options.transaction;
-      if (transaction && transaction.connection &&
-          transaction.connector === this) {
+      if (transaction && transaction.connection && transaction.connector === this) {
         res = await this.connector.runSQL(transaction.connection, sql, params);
       } else {
         res = await this.connector.execSql(sql, params);
@@ -181,8 +175,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
 
 
-  getCountForAffectedRows(model: string, result?: SqlRunResult): number
-      |undefined {
+  getCountForAffectedRows(model: string, result?: SqlRunResult): number|undefined {
     return (result && result.changes) || 0;
   }
 
@@ -196,10 +189,8 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   fromColumnValue(prop: PropertyDefinition, value: any): any {
     /* istanbul ignore else */
-    if (prop && prop[this.name] && prop[this.name].transform &&
-        prop[this.name].transform.fromDB) {
-      const v = prop[this.name].transform.fromDB(
-          value);  // using 'undefined' for NULL
+    if (prop && prop[this.name] && prop[this.name].transform && prop[this.name].transform.fromDB) {
+      const v = prop[this.name].transform.fromDB(value);  // using 'undefined' for NULL
       return v !== undefined ? v : this.settings.propertyValueForNULL;
     }
     /* istanbul ignore next */
@@ -209,8 +200,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   toColumnValue(prop: PropertyDefinition, value: any): any {
     /* istanbul ignore else */
-    if (prop && prop[this.name] && prop[this.name].transform &&
-        prop[this.name].transform.toDB) {
+    if (prop && prop[this.name] && prop[this.name].transform && prop[this.name].transform.toDB) {
       return prop[this.name].transform.toDB(value);
     }
     /* istanbul ignore next */
@@ -259,8 +249,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
 
   static buildLimit(filter: Filter): string|undefined {
     const limit = filter.limit ? (isNaN(filter.limit) ? 0 : filter.limit) : 0;
-    const offset =
-        filter.offset ? (isNaN(filter.offset) ? 0 : filter.offset) : 0;
+    const offset = filter.offset ? (isNaN(filter.offset) ? 0 : filter.offset) : 0;
     /* istanbul ignore if */
     if (!limit && !offset) {
       return undefined;
@@ -276,8 +265,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     return res.join(' ');
   }
 
-  applyPagination(model: string, sql: ParameterizedSQL, filter: Filter):
-      ParameterizedSQL {
+  applyPagination(model: string, sql: ParameterizedSQL, filter: Filter): ParameterizedSQL {
     const limitClause = Sqlite3JugglerConnector.buildLimit(filter);
     return limitClause ? sql.merge(limitClause) : sql;
   }
@@ -297,8 +285,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     const fn = async(): Promise<void> => {
       try {
         const metaModel = this.getMetaModel(model, true);
-        await this.promisifiedExecuteSql(
-            metaModel.table.getCreateTableStatement());
+        await this.promisifiedExecuteSql(metaModel.table.getCreateTableStatement());
       } catch (err /* istanbul ignore next */) {
         return Promise.reject(err);
       }
@@ -317,8 +304,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     const fn = async(): Promise<void> => {
       try {
         const metaModel = this.getMetaModel(model);
-        await this.promisifiedExecuteSql(
-            metaModel.table.getDropTableStatement());
+        await this.promisifiedExecuteSql(metaModel.table.getDropTableStatement());
       } catch (err /* istanbul ignore next */) {
         return Promise.reject(err);
       }
@@ -383,8 +369,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
    */
   isActual(models?: string|string[], cb?: Callback): PromiseOrVoid<boolean>;
   isActual(cb?: Callback): PromiseOrVoid<boolean>;
-  isActual(models?: string|string[]|Callback, cb?: Callback):
-      PromiseOrVoid<boolean> {
+  isActual(models?: string|string[]|Callback, cb?: Callback): PromiseOrVoid<boolean> {
     if (!cb && typeof models === 'function') {
       cb = models;
       models = undefined;
@@ -396,8 +381,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
     return this._isActual(models as string[], cb);
   }
 
-  protected _isActual(models?: string[], cb?: Callback):
-      PromiseOrVoid<boolean> {
+  protected _isActual(models?: string[], cb?: Callback): PromiseOrVoid<boolean> {
     return callbackifyOrPromise(this.promisifiedIsActual(models), cb);
   }
 
@@ -443,14 +427,12 @@ export class Sqlite3JugglerConnector extends SQLConnector implements
   // -------------------------------------------------------------------------------------
 
   getMetaModel(modelName: string, recreate?: boolean): MetaModel {
-    const lbModelDef: any /* juggler.PersistedModelClass */ =
-        (this as any)._models[modelName];
+    const lbModelDef: any /* juggler.PersistedModelClass */ = (this as any)._models[modelName];
     /* istanbul ignore if */
     if (!lbModelDef) {
       throw new Error(`model '${modelName}' not found`);
     }
-    return this.connector.getMetaModelFromJuggler(
-        modelName, lbModelDef, recreate);
+    return this.connector.getMetaModelFromJuggler(modelName, lbModelDef, recreate);
   }
 
   destroyMetaModel(modelName: string): void {
@@ -480,9 +462,8 @@ export function initialize(dataSource: DataSource, cb?: Callback<void>): void {
   if (dataSource.settings && !!dataSource.settings.debug) {
     Sqlite3Connector.debugEnabled = true;
   }
-  debug(`initialize ${SQLITE3_CONNECTOR_NAME} juggler connector...`);
-  const connector =
-      new Sqlite3JugglerConnector(dataSource.settings as Sqlite3Settings);
+  debug(`initialize ${SQLITE3_CONNECTOR_NAME} juggler connector ...`);
+  const connector = new Sqlite3JugglerConnector(dataSource.settings as Sqlite3Settings);
   dataSource.connector = connector;
   dataSource.connector.dataSource = dataSource;
   /* istanbul ignore else */

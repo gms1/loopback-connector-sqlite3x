@@ -9,16 +9,23 @@
 
 
 declare module 'loopback-connector' {
-  import {Callback, Connector as ConnectorInterface, DataSource, Filter, PromiseOrVoid, PropertyDefinition, Transaction as TransactionInterface, TransactionMixin} from 'loopback-datasource-juggler';
+  import {
+    Callback,
+    Connector as ConnectorInterface,
+    DataSource,
+    Filter,
+    PromiseOrVoid,
+    PropertyDefinition,
+    Transaction as TransactionInterface,
+    TransactionMixin
+  } from 'loopback-datasource-juggler';
 
   export class Connector implements ConnectorInterface {
     name: string;  // Name/type of the connector
     dataSource?: DataSource;
-    connect(callback?: Callback):
-        PromiseOrVoid;  // Connect to the underlying system
-    disconnect(callback?: Callback):
-        PromiseOrVoid;  // Disconnect from the underlying system
-    ping(callback?: Callback): PromiseOrVoid;  // Ping the underlying system
+    connect(callback?: Callback): PromiseOrVoid;     // Connect to the underlying system
+    disconnect(callback?: Callback): PromiseOrVoid;  // Disconnect from the underlying system
+    ping(callback?: Callback): PromiseOrVoid;        // Ping the underlying system
     execute?(...args: any[]): Promise<any>;
   }
 
@@ -29,12 +36,9 @@ declare module 'loopback-connector' {
 
     execute(...args: any[]): Promise<any>;
 
-    executeSQL(
-        sql: string, params?: any[], options?: object,
-        callback?: Callback): PromiseOrVoid;
+    executeSQL(sql: string, params?: any[], options?: object, callback?: Callback): PromiseOrVoid;
 
-    automigrate(models?: string|string[]|Callback, cb?: Callback):
-        PromiseOrVoid;
+    automigrate(models?: string|string[]|Callback, cb?: Callback): PromiseOrVoid;
     serializeObject(val: any): string;
   }
 
@@ -55,7 +59,6 @@ declare module 'loopback-connector' {
     rollback(callback?: Callback): PromiseOrVoid;
 
 
-    static begin(connector: Connector, options: Object, callback?: Callback):
-        PromiseOrVoid<Transaction>;
+    static begin(connector: Connector, options: Object, callback?: Callback): PromiseOrVoid<Transaction>;
   }
 }

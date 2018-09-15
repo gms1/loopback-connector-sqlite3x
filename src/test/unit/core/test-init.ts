@@ -6,12 +6,13 @@ import * as ConnectorModule from '../../..';
 const glob = global as any;
 glob.ds = undefined;
 
-let defaultConfig: object = {};
-export function setDefaultConfig(config: {}): void {
-  defaultConfig = config;
+let defaultConfig: any = {};
+export function setDefaultConfig(config: any): void {
+  defaultConfig = config || {};
 }
 
-export function initDataSource(config: object = defaultConfig): DataSource {
+export function initDataSource(config: any = defaultConfig): DataSource {
+  config.name = config.name || 'test datasource';
   glob.ds = new DataSource(ConnectorModule as any, config);
   glob.getDataSource = glob.getSchema = (): DataSource => {
     return glob.ds;

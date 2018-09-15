@@ -2,6 +2,7 @@
 import {SqlDatabaseSettings} from 'sqlite3orm';
 
 export interface Sqlite3AllSettings {
+  name: string;
   /**
    * file - The database file to open
    */
