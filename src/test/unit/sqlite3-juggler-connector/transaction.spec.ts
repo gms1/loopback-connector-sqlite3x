@@ -1,31 +1,28 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable await-promise
-import {DataSource} from 'loopback-datasource-juggler';
-import * as should from 'should';
 import {SqlDatabase} from 'sqlite3orm';
 
-import {Sqlite3JugglerConnector} from '../../..';
 import {Transaction} from '../../../lc-import';
-import {initDataSource} from '../core/test-init';
+import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
+import {Sqlite3JugglerConnector} from '../../..';
+import {DataSource} from 'loopback-datasource-juggler';
 
 
-describe('loopback-connector transaction', () => {
+
+describe('sqlite3-juggler-connector: transaction', () => {
   let ds: DataSource;
   let connector: Sqlite3JugglerConnector;
   let connection: SqlDatabase;
 
   before(async () => {
-    try {
-      ds = initDataSource();
-      should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
-      connector = ds.connector as any as Sqlite3JugglerConnector;
+    ds = getDefaultDataSource();
+    connector = getDefaultConnector();
+    if (!ds.connected) {
       await ds.connect();
-      connection = await connector.pool.get();
-      await connection.exec(
-          'CREATE TABLE TEST (id INTEGER NOT NULL PRIMARY KEY, col VARCHAR(50))');
-    } catch (err) {
-      err.should.fail();
     }
+    connection = await connector.pool.get();
+    await connection.exec('DROP TABLE IF EXISTS TEST');
+    await connection.exec('CREATE TABLE TEST (id INTEGER NOT NULL PRIMARY KEY, col VARCHAR(50))');
   });
 
   afterEach(async () => {
@@ -37,16 +34,11 @@ describe('loopback-connector transaction', () => {
   });
 
   after(async () => {
-    try {
-      await connection.exec('DROP TABLE TEST');
-      await connection.close();
-      connection = undefined as any as SqlDatabase;
-      connector = undefined as any as Sqlite3JugglerConnector;
-      await ds.disconnect();
-      ds = undefined as any as DataSource;
-    } catch (err) {
-      err.should.fail();
+    for (const modelName of connector.modelNames()) {
+      await connector.dropTable(modelName);
     }
+    connector.destroyAllMetaModels();
+    await connection.close();
   });
 
 
@@ -91,12 +83,10 @@ describe('loopback-connector transaction', () => {
       const tx = await getTransaction();
       let rows: any[];
 
-      await(tx.connection as SqlDatabase)
-          .run('INSERT INTO TEST (id, col) values (1, \'commit test\')');
+      await(tx.connection as SqlDatabase).run('INSERT INTO TEST (id, col) values (1, \'commit test\')');
 
       // tx session should see newly inserted row
-      rows = await(tx.connection as SqlDatabase)
-                 .all('SELECT id, col FROM TEST ORDER BY id');
+      rows = await(tx.connection as SqlDatabase).all('SELECT id, col FROM TEST ORDER BY id');
       rows.length.should.be.equal(1);
 
       // other sessions should not see newly inserted row
@@ -118,12 +108,10 @@ describe('loopback-connector transaction', () => {
     const tx = await getTransaction();
     let rows: any[];
 
-    await(tx.connection as SqlDatabase)
-        .run('INSERT INTO TEST (id, col) values (2, \'rollback test\')');
+    await(tx.connection as SqlDatabase).run('INSERT INTO TEST (id, col) values (2, \'rollback test\')');
 
     // tx session should see newly inserted row
-    rows = await(tx.connection as SqlDatabase)
-               .all('SELECT id, col FROM TEST ORDER BY id');
+    rows = await(tx.connection as SqlDatabase).all('SELECT id, col FROM TEST ORDER BY id');
     rows.length.should.be.equal(1);
 
     // other sessions should not see newly inserted row

@@ -20,7 +20,7 @@ const g = new _sg();
 export const SQLITE3_CONNECTOR_NAME = 'sqlite3x';
 const SQLITE3_CONNECTOR_DESCRIPTION = g.f('unofficial LoopBack connector for SQLite3');
 
-const debug = _dbg('loopback:connector:sqlite3x');
+const debug = _dbg('sqlite3x');
 
 
 export class Sqlite3Connector implements Connector {
@@ -46,7 +46,6 @@ export class Sqlite3Connector implements Connector {
     if (Sqlite3Connector.debugEnabled) {
       debug(`${SQLITE3_CONNECTOR_NAME}`);
       debug(`  ${SQLITE3_CONNECTOR_DESCRIPTION}`);
-      debug(`  datasource: '${this.settings.name}'`);
       debug(`  settings: %j`, settings);
       SqlDatabase.verbose();
     }
@@ -70,11 +69,8 @@ export class Sqlite3Connector implements Connector {
    * @returns a void-promise
    */
   async connect(): Promise<void> {
-    if (this.pool.isOpen()) {
-      return;
-    }
     try {
-      debug('connecting pool...');
+      debug(`connecting pool...`);
       await this.pool.open(
           this.settings.file, this.settings.mode, this.settings.poolMin, this.settings.poolMax,
           this.settings.dbSettings);
@@ -121,17 +117,7 @@ export class Sqlite3Connector implements Connector {
     if (!this.pool || !this.pool.isOpen()) {
       return Promise.reject(new Error(g.f('no pool connected')));
     }
-    try {
-      /* istanbul ignore if */
-      if (this.pool.opening) {
-        // waiting for pool to open
-        await this.pool.opening;
-      }
-      const res = await this.pool.get();
-      return res;
-    } catch (err) /* istanbul ignore next */ {
-      return Promise.reject(g.f('connecting failed'));
-    }
+    return this.pool.get();
   }
 
   /**
@@ -290,12 +276,8 @@ export class Sqlite3Connector implements Connector {
       connectorSettings.dbSettings = {};
     }
     /* istanbul ignore else */
-    if (!connectorSettings.dbSettings.journalMode) {
-      connectorSettings.dbSettings.journalMode = 'WAL';
-    }
-    /* istanbul ignore else */
     if (!connectorSettings.dbSettings.busyTimeout) {
-      connectorSettings.dbSettings.busyTimeout = 6000;
+      connectorSettings.dbSettings.busyTimeout = 30000;
     }
     /* istanbul ignore else */
     if (!connectorSettings.dbSettings.readUncommitted) {

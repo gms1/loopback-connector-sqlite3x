@@ -8,21 +8,40 @@ import {
   PropertyDefinition,
   TransactionMixin
 } from 'loopback-datasource-juggler';
-import {AutoUpgrader, MetaModel, SqlConnectionPool, SqlDatabase, SqlRunResult, Table} from 'sqlite3orm';
+import {
+  AutoUpgrader,
+  MetaModel,
+  SqlConnectionPool,
+  SqlDatabase,
+  SqlRunResult,
+  Table,
+  UpgradeInfo,
+  sequentialize
+} from 'sqlite3orm';
 
 import {ParameterizedSQL, SQLConnector} from './lc-import';
 import {SQLITE3_CONNECTOR_NAME, Sqlite3Connector} from './sqlite3-connector';
 import {Sqlite3ExecuteOptions} from './sqlite3-options';
 import {Sqlite3AllSettings, Sqlite3Settings} from './sqlite3-settings';
-import {callbackifyOrPromise} from './utils';
+import {callbackifyOrPromise, callbackify} from './utils';
+import {
+  DiscoveredSchema,
+  DiscoveredTable,
+  DiscoveryService,
+  DiscoverSchemasOptions,
+  Schemas,
+  defaultNameMapper
+} from './discovery-service';
 
 /* istanbul ignore next */
 function debug(arg: any, ...args: any[]): void {
   Sqlite3Connector.debug(arg, ...args);
 }
 
+
+
 /*
- * wrapper class around Sqlite3CrudConnector to make juggler happy
+ * juggler sql-connector
  */
 export class Sqlite3JugglerConnector extends SQLConnector implements TransactionMixin {
   readonly name: string = SQLITE3_CONNECTOR_NAME;
@@ -327,37 +346,36 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
       cb = models;
       models = undefined;
     }
-    if (models && typeof models === 'string') {
-      models = [models];
-    }
     models = models || Object.keys((this as any)._models);
     return this._autoupate(models as string[], cb);
   }
 
   protected _autoupate(models?: string[], cb?: Callback): PromiseOrVoid {
-    return callbackifyOrPromise(this.promisifiedAutoupdate(models), cb);
+    return callbackifyOrPromise(this.executeAutoupdate(models), cb);
   }
 
-  protected async promisifiedAutoupdate(models?: string[]): Promise<void> {
+  async executeAutoupdate(model?: string|string[]): Promise<void> {
+    let connection: SqlDatabase|undefined;
+    const models: string[]|undefined = model ? typeof model === 'string' ? [model] : model : undefined;
     try {
       const tables: Table[] = [];
       /* istanbul ignore else */
       if (models) {
-        models.forEach((model) => {
-          const metaModel = this.getMetaModel(model, true);
+        models.forEach((modelName) => {
+          const metaModel = this.getMetaModel(modelName, true);
           tables.push(metaModel.table);
         });
       }
-      const connection = await this.connector.getConnection();
+      connection = await this.connector.getConnection();
 
       const autoUpgrader = new AutoUpgrader(connection);
       await autoUpgrader.upgradeTables(tables);
-      try {
-        await connection.close();
-      } catch (_ignore) {
-      }
     } catch (err) /* istanbul ignore next */ {
       return Promise.reject(err);
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
     }
   }
 
@@ -374,53 +392,152 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
       cb = models;
       models = undefined;
     }
-    if (models && typeof models === 'string') {
-      models = [models];
-    }
     models = models || Object.keys((this as any)._models);
     return this._isActual(models as string[], cb);
   }
 
   protected _isActual(models?: string[], cb?: Callback): PromiseOrVoid<boolean> {
-    return callbackifyOrPromise(this.promisifiedIsActual(models), cb);
+    return callbackifyOrPromise(this.executeIsActual(models), cb);
   }
 
-  protected async promisifiedIsActual(models?: string[]): Promise<boolean> {
+  async executeIsActual(model?: string|string[]): Promise<boolean> {
+    let connection: SqlDatabase|undefined;
+    const models: string[]|undefined = model ? typeof model === 'string' ? [model] : model : undefined;
     try {
       const tables: Table[] = [];
       /* istanbul ignore else */
       if (models) {
-        models.forEach((model) => {
-          const metaModel = this.getMetaModel(model, true);
+        models.forEach((modelName) => {
+          const metaModel = this.getMetaModel(modelName, true);
           tables.push(metaModel.table);
         });
       }
-      const connection = await this.connector.getConnection();
+      connection = await this.connector.getConnection();
 
       const autoUpgrader = new AutoUpgrader(connection);
       const result = await autoUpgrader.isActual(tables);
-      try {
-        await connection.close();
-      } catch (_ignore) {
-      }
       return result;
     } catch (err) /* istanbul ignore next */ {
       return Promise.reject(err);
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
+    }
+  }
+
+  async getUpgradeInfo(model: string): Promise<UpgradeInfo> {
+    let connection: SqlDatabase|undefined;
+    try {
+      const metaModel = this.getMetaModel(model, true);
+      connection = await this.connector.getConnection();
+
+      const autoUpgrader = new AutoUpgrader(connection);
+      const result = await autoUpgrader.getUpgradeInfo(metaModel.table);
+      return result;
+    } catch (err) /* istanbul ignore next */ {
+      return Promise.reject(err);
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
     }
   }
 
   // *************************************************************************************
-  // TODO(?): discover model definition
+  // discover
   // -------------------------------------------------------------------------------------
 
-  // discoverModelDefinitions
-  // discoverModelProperties
-  // discoverPrimaryKeys
-  // discoverForeignKeys
-  // discoverExportedForeignKeys
-  // discoverSchema
+  discoverDatabaseSchemas(cb: Callback<DiscoveredSchema[]>): void;
+  discoverDatabaseSchemas(options: Object, cb: Callback<DiscoveredSchema[]>): void;
+  discoverDatabaseSchemas(options?: Object|Callback<DiscoveredSchema[]>, cb?: Callback<DiscoveredSchema[]>): void {
+    if (typeof options === 'function' && !cb) {
+      cb = options;
+      options = {};
+    }
+    if (!cb) {
+      return;
+    }
+    const ds = new DiscoveryService(this.pool);
+    callbackify(ds.schemas(), cb);
+  }
 
-  // discoverAndBuildModels
+  discoverModelDefinitions(cb: Callback<DiscoveredTable[]>): void;
+  discoverModelDefinitions(options: Object, cb: Callback<DiscoveredTable[]>): void;
+  discoverModelDefinitions(options?: Object|Callback<DiscoveredTable[]>, cb?: Callback<DiscoveredTable[]>): void {
+    if (typeof options === 'function' && !cb) {
+      cb = options;
+      options = {};
+    }
+    if (!cb) {
+      return;
+    }
+    if (!options) {
+      options = {};
+    }
+    const schemaName = (options as any).owner || (options as any).schema || this.settings.schemaName;
+    const ds = new DiscoveryService(this.pool);
+    callbackify(ds.tables(schemaName), cb);
+  }
+
+
+  discoverSchemas(tableName: string, options: DiscoverSchemasOptions, cb: Callback<Schemas>): void {
+    callbackify(this.executeDiscoverSchemas(tableName, options), cb);
+  }
+
+  async executeDiscoverSchemas(tableName: string, options: DiscoverSchemasOptions): Promise<Schemas> {
+    const ds = new DiscoveryService(this.pool);
+
+    if (options.nameMapper === undefined) {
+      options.nameMapper = defaultNameMapper;
+    }
+    const schemaName = options.owner || options.schema || this.settings.schemaName;
+    const schemaKey = `${schemaName}.${tableName}`;
+
+    options.visited = options.visited || {};
+    if (options.visited[schemaKey]) {
+      return options.visited;
+    }
+    try {
+      const schema = await ds.table(tableName, schemaName, options);
+      if (options.visited[schemaKey]) {
+        return options.visited;
+      }
+      options.visited[schemaKey] = schema;
+      debug(`disovered: ${schemaKey}`);
+      const fks = schema.options.foreignKeys;
+      if (!fks || Object.keys(fks).length === 0 || (!options.associations && !options.relations)) {
+        return options.visited;
+      }
+
+      schema.options.relations = {};
+      Object.keys(fks).forEach((fkName) => {
+        const fk = fks[fkName];
+        // NOTE: fkName is a generic name not intended for use in model definitions
+        // => defering fkModelName from refTable
+        const fkModelName = options.nameMapper ? options.nameMapper('fk', fk.refTable) : fk.refTable;
+        let fkKey = fkModelName;
+        let fkLastId = 0;
+        // tslint:disable-next-line no-non-null-assertion
+        while (schema.options.relations![fkKey]) {
+          fkKey = `${fkModelName}${++fkLastId}`;
+        }
+        (schema.options.relations as any)[fkKey] = {
+          model: options.nameMapper ? options.nameMapper('table', fk.refTable) : fk.refTable,
+          type: 'belongsTo',
+          foreignKey: fk.properties
+        };
+      });
+
+      // NOTE: because of sqlite3 limitation, all referenced tables are in the same schema as the referencing table
+      await sequentialize(
+          Object.keys(fks).map((fkName) => () => this.executeDiscoverSchemas(fks[fkName].refTable, options)));
+
+      return options.visited;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
 
   // *************************************************************************************
   // model definitions

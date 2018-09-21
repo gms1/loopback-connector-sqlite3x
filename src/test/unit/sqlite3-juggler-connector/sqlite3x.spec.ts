@@ -1,19 +1,18 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable variable-name no-null-keyword
 // tslint:disable await-promise
-import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 import * as sinon from 'sinon';
 
+import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
 import {Sqlite3JugglerConnector} from '../../..';
-import {getDataSource, initDataSource} from '../core/test-init';
+import {DataSource} from 'loopback-datasource-juggler';
 
-initDataSource();
 
-describe('loopback-datasource-juggler sqlite3x', () => {
+describe('sqlite3-juggler-connector: basic', () => {
   let ds: DataSource;
-  let db: any;
   let connector: Sqlite3JugglerConnector;
+  let db: any;
 
   const postBasicSchema = {
     name: 'PostBasic',
@@ -38,11 +37,16 @@ describe('loopback-datasource-juggler sqlite3x', () => {
 
   let escapedID: string;
 
-  before(() => {
-    ds = getDataSource();
+  before(async () => {
+    ds = getDefaultDataSource();
+    connector = getDefaultConnector();
     db = ds as any;
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
-    connector = ds.connector as Sqlite3JugglerConnector;
+    if (!ds.connected) {
+      await ds.connect();
+    }
+    const connection = await connector.pool.get();
+    await connection.exec('DROP TABLE IF EXISTS POST_BASIC');
+    await connection.close();
     escapedID = connector.escapeName('ID') as string;
     const models: any = db.modelBuilder.buildModels(postBasicSchema);
     Post = models[postBasicSchema.name];
@@ -57,13 +61,10 @@ describe('loopback-datasource-juggler sqlite3x', () => {
   });
 
   after(async () => {
-    try {
-      await connector.dropTable(postBasicSchema.name);
-    } catch (err) {
-      return Promise.reject(err);
+    for (const modelName of connector.modelNames()) {
+      await connector.dropTable(modelName);
     }
-    connector.destroyMetaModel(postBasicSchema.name);
-    return;
+    connector.destroyAllMetaModels();
   });
 
   beforeEach(() => {
@@ -188,6 +189,5 @@ describe('loopback-datasource-juggler sqlite3x', () => {
       done();
     });
   });
-
 
 });

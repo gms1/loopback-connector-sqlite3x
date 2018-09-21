@@ -1,28 +1,56 @@
 // tslint:disable no-implicit-dependencies no-require-imports
 import {DataSource} from 'loopback-datasource-juggler';
+import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 
 import * as ConnectorModule from '../../..';
 
-const glob = global as any;
-glob.ds = undefined;
 
-let defaultConfig: any = {};
-export function setDefaultConfig(config: any): void {
-  defaultConfig = config || {};
-}
+let defaultDataSource: DataSource;
 
-export function initDataSource(config: any = defaultConfig): DataSource {
-  config.name = config.name || 'test datasource';
-  glob.ds = new DataSource(ConnectorModule as any, config);
-  glob.getDataSource = glob.getSchema = (): DataSource => {
-    return glob.ds;
+export function getDefaultDataSource(): DataSource {
+  if (defaultDataSource) {
+    return defaultDataSource;
+  }
+
+  const config: any = {
+    name: `test`,
+    file: `test.db`,
+    poolMin: 5,
+    poolMax: 20,
   };
-  return glob.ds;
+  defaultDataSource = new DataSource(ConnectorModule as any, config);
+  return defaultDataSource;
 }
 
-export function getDataSource(): DataSource {
-  return glob.ds;
+
+
+export function getDefaultConnector(): Sqlite3JugglerConnector {
+  return getDefaultDataSource().connector as Sqlite3JugglerConnector;
 }
+
+// ================================================================
+// for executing juggler imported tests:
+
+const JUGGLER_TEST_DATABASE = 'test.db';
+const JUGGLER_DATASOURCE_NAME = 'test imports';
+
+let jugglerDataSource: DataSource;
+
+function getJugglerDataSource(): DataSource {
+  return jugglerDataSource;
+}
+
+const glob = global as any;
+
+export function initJugglerDataSource(config: any): DataSource {
+  glob.getDataSource = glob.getSchema = getJugglerDataSource;
+  config = config || {};
+  config.name = config.name || JUGGLER_DATASOURCE_NAME;
+  config.file = config.file || JUGGLER_TEST_DATABASE;
+  jugglerDataSource = new DataSource(ConnectorModule as any, config);
+  return jugglerDataSource;
+}
+
 
 // TODO: evaluate if additional features can be supported:
 glob.connectorCapabilities = {

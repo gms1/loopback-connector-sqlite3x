@@ -6,7 +6,7 @@ import {SQL_OPEN_READWRITE} from '../../..';
 import {Sqlite3CrudConnector} from '../../../sqlite3-crud-connector';
 
 
-describe('crud-connector connections', () => {
+describe('sqlite3-crud-connector: connections', () => {
 
   it('should connect using default settings', async () => {
     const connector = new Sqlite3CrudConnector();

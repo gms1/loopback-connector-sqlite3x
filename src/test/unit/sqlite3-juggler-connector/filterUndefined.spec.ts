@@ -1,18 +1,16 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable variable-name no-null-keyword
 // tslint:disable await-promise
-import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
-import {Sqlite3JugglerConnector} from '../../..';
 
-import {getDataSource, initDataSource} from '../core/test-init';
+import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
+import {DataSource} from 'loopback-datasource-juggler';
+import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 
-initDataSource();
-
-describe('loopback-datasource-juggler filter undefined fields', () => {
+describe('sqlite3-juggler-connector: filter undefined fields', () => {
   let ds: DataSource;
-  let db: any;
   let connector: Sqlite3JugglerConnector;
+  let db: any;
 
   const postFilterUndefinedSchema = {
     name: 'PostFilterUndefined',
@@ -27,11 +25,16 @@ describe('loopback-datasource-juggler filter undefined fields', () => {
   };
   let Post: any;
 
-  before(() => {
-    ds = getDataSource();
+  before(async () => {
+    ds = getDefaultDataSource();
+    connector = getDefaultConnector();
     db = ds as any;
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
-    connector = ds.connector as Sqlite3JugglerConnector;
+    if (!ds.connected) {
+      await ds.connect();
+    }
+    const connection = await connector.pool.get();
+    await connection.exec('DROP TABLE IF EXISTS POST_FILTER_UNDEFINED');
+    await connection.close();
     const models: any = db.modelBuilder.buildModels(postFilterUndefinedSchema);
     Post = models[postFilterUndefinedSchema.name];
     Post.attachTo(db);
@@ -46,13 +49,10 @@ describe('loopback-datasource-juggler filter undefined fields', () => {
 
 
   after(async () => {
-    try {
-      await connector.dropTable(postFilterUndefinedSchema.name);
-    } catch (err) {
-      return Promise.reject(err);
+    for (const modelName of connector.modelNames()) {
+      await connector.dropTable(modelName);
     }
-    connector.destroyMetaModel(postFilterUndefinedSchema.name);
-    return;
+    connector.destroyAllMetaModels();
   });
 
   it('should insert only default value', (done) => {

@@ -1,38 +1,38 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable await-promise
-import {DataSource} from 'loopback-datasource-juggler';
 import * as should from 'should';
 
-import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 
 // todo: test index definitions using standard, shortened and MySql form
 // todo: test foreignKeys
-import {getDataSource, initDataSource} from './test-init';
+import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
+import {DataSource} from 'loopback-datasource-juggler';
+import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 
-initDataSource();
 
-describe('meta-model (juggler)', () => {
+describe('sqlite3-juggler-connector: meta model', () => {
   let ds: DataSource;
-  let db: any;
   let connector: Sqlite3JugglerConnector;
+  let db: any;
 
-  before(() => {
-    ds = getDataSource();
+  before(async () => {
+    ds = getDefaultDataSource();
+    connector = getDefaultConnector();
     db = ds as any;
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
-    connector = ds.connector as Sqlite3JugglerConnector;
+    if (!ds.connected) {
+      await ds.connect();
+    }
+    const connection = await connector.pool.get();
+    await connection.exec('DROP TABLE IF EXISTS TEST_TABLE');
+    await connection.exec('DROP TABLE IF EXISTS TEST_PARENT_TABLE');
+    await connection.close();
   });
 
   afterEach(async () => {
-    try {
-      for (const modelName of connector.modelNames()) {
-        await connector.dropTable(modelName);
-      }
-    } catch (err) {
-      return Promise.reject(err);
+    for (const modelName of connector.modelNames()) {
+      await connector.dropTable(modelName);
     }
     connector.destroyAllMetaModels();
-    return;
   });
 
   // ==============================================================================

@@ -1,6 +1,9 @@
 # loopback-connector-sqlite3x
 
-alternative and unofficial LoopBack connector for SQLite3.
+This is the unofficial SQLite3 connector module for the LoopBack framework.
+
+Unlike the official, this module provides full support for e.g auto-migrate, auto-upgrade and model discovery.
+(please see [Features](#features))
 
 [![npm version](https://badge.fury.io/js/loopback-connector-sqlite3x.svg)](https://badge.fury.io/js/loopback-connector-sqlite3x)
 [![Known Vulnerabilities](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x/badge.svg)](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x)
@@ -13,13 +16,15 @@ alternative and unofficial LoopBack connector for SQLite3.
 ## Features
 
 * auto-migrate and auto-update for tables, indexes, foreign keys
-* connection pool
+* model discovery
 * full control over the names for tables, fields, indexes and foreign key constraints in the mapped database schema
+* connection pool
+* all other features provided by [sqlite3orm](https://github.com/gms1/node-sqlite3-orm)
 
 ### TODO
 
-* discovering models
-* LB4 CrudConnector (if we gain any advantage)
+* LB4: better sqlite3orm integration: share/sync model definitions for entities
+* LB4: CrudConnector (if we gain any advantage)
   
 ## Installation
 
