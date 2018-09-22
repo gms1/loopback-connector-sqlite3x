@@ -9,6 +9,8 @@ import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
 import {table, field, id, schema, fk} from 'sqlite3orm';
 import {DataSource} from 'loopback-datasource-juggler';
 import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
+import {DiscoveredTable, DiscoveredSchema} from '../../../discovery-service';
+import {expect} from '@loopback/testlab';
 
 describe('sqlite3-juggler-connector: discover model', () => {
   let ds: DataSource;
@@ -155,5 +157,38 @@ describe('sqlite3-juggler-connector: discover model', () => {
     });
   });
 
+  it('should discover model definitions', (done) => {
+    (ds.connector as Sqlite3JugglerConnector)
+        .discoverModelDefinitions({}, (err, data: DiscoveredTable[] | undefined) => {
+          if (err) {
+            done(err);
+            return;
+          }
+          if (!data) {
+            done(`nothing found`);
+            return;
+          }
+          console.log(`discovered model defs: `, JSON.stringify(data));
+          data.filter((item: any) => item.name.indexOf('DISCOVER') === 0).length.should.be.eql(2);
+          done();
+        });
+  });
+
+  it('should discover database schemas', (done) => {
+    (ds.connector as Sqlite3JugglerConnector)
+        .discoverDatabaseSchemas({}, (err, data: DiscoveredSchema[] | undefined) => {
+          if (err) {
+            done(err);
+            return;
+          }
+          if (!data) {
+            done(`nothing found`);
+            return;
+          }
+          console.log(`discovered schema defs: `, JSON.stringify(data));
+          data.length.should.be.greaterThan(0);
+          done();
+        });
+  });
 
 });

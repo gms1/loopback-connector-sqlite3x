@@ -246,8 +246,14 @@ describe('sqlite3-juggler-connector: meta model', () => {
       options: {
         idInjection: false,
         sqlite3x: {tableName: 'TEST_TABLE'},
-        foreignKeys:
-            {fk: {properties: 'parentId1, parentId2', refColumns: ' IDP1 , IDP2 ', refTable: 'TEST_PARENT_TABLE'}}
+        foreignKeys: {
+          fk: {
+            name: 'toParent',
+            properties: 'parentId1, parentId2',
+            refColumns: ' IDP1 , IDP2 ',
+            refTable: 'TEST_PARENT_TABLE'
+          }
+        }
       },
       properties: {
         id: {
@@ -285,6 +291,39 @@ describe('sqlite3-juggler-connector: meta model', () => {
       should.not.exists(err);
     }
 
+  });
+
+
+
+  // ==============================================================================
+  it('autoIncrement from generated', async () => {
+    const testSchema = {
+      name: 'TestModel',
+      options: {
+        idInjection: false,
+        sqlite3x: {tableName: 'TEST_TABLE'},
+      },
+      properties: {
+        id: {
+          type: 'Number',
+          id: 1,
+          generated: 1,
+          sqlite3x: {columnName: 'IDC', dbtype: 'INTEGER NOT NULL'},
+        },
+      }
+    };
+
+    const models: any = db.modelBuilder.buildModels([testSchema]);
+    const testModel: any = models[testSchema.name];
+    testModel.attachTo(db);
+    try {
+      await ds.automigrate(testSchema.name);
+    } catch (err) {
+      should.not.exists(err);
+    }
+    const metaModel = connector.getMetaModel(testSchema.name);
+    const table = metaModel.table;
+    table.isAutoIncrementDefined.should.be.true();
   });
 
 

@@ -480,11 +480,24 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
     callbackify(ds.tables(schemaName), cb);
   }
 
-
+  /*
+   * discover schema from a given tableName
+   * @param tableName
+   * @param options
+   * @param cb callback
+   *
+   */
   discoverSchemas(tableName: string, options: DiscoverSchemasOptions, cb: Callback<Schemas>): void {
     callbackify(this.executeDiscoverSchemas(tableName, options), cb);
   }
 
+  /*
+   * discover schema from a given tableName
+   * @param tableName
+   * @param options
+   * @returns promise
+   *
+   */
   async executeDiscoverSchemas(tableName: string, options: DiscoverSchemasOptions): Promise<Schemas> {
     const ds = new DiscoveryService(this.pool);
 
