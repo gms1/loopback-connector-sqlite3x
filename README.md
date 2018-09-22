@@ -1,6 +1,6 @@
 # loopback-connector-sqlite3x
 
-This is the unofficial SQLite3 connector module for the LoopBack framework.
+The advanced but unofficial SQLite3 Connector Module for the LoopBack Framework.
 
 Unlike the official, this module provides full support for e.g auto-migrate, auto-upgrade and model discovery.
 (please see [Features](#features))
