@@ -29,9 +29,6 @@ describe('sqlite3-crud-connector: DefaultCrudRepository', () => {
 
     constructor(data: Partial<Note1>) {
       super(data);
-      // NOTE: do not initialize properties here or this will overwrite the
-      // property values from repo.findById
-      // TODO: report issue?
     }
   }
 

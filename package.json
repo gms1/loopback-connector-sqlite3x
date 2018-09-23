@@ -34,7 +34,7 @@
     "prebuild": "build/sh/tsrun prebuild.ts",
     "build": "tsc -p tsconfig.json",
     "rebuild": "npm run clean && npm run build",
-    "lint": "tslint -p tsconfig.json -c tslint.full.json",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
     "test:run": "mocha -t 40000 -r ts-node/register 'src/**/*.ts'",
     "test:minimal": "npm run test:run -- --grep imported --invert",
     "test": "npm run rebuild && npm run test:run",
