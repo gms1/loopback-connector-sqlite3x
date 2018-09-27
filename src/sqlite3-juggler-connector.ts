@@ -452,7 +452,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
   discoverDatabaseSchemas(options: Object, cb: Callback<DiscoveredSchema[]>): void;
   discoverDatabaseSchemas(options?: Object|Callback<DiscoveredSchema[]>, cb?: Callback<DiscoveredSchema[]>): void {
     if (typeof options === 'function' && !cb) {
-      cb = options;
+      cb = options as Callback<DiscoveredSchema[]>;
       options = {};
     }
     if (!cb) {
@@ -466,7 +466,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
   discoverModelDefinitions(options: Object, cb: Callback<DiscoveredTable[]>): void;
   discoverModelDefinitions(options?: Object|Callback<DiscoveredTable[]>, cb?: Callback<DiscoveredTable[]>): void {
     if (typeof options === 'function' && !cb) {
-      cb = options;
+      cb = options as Callback<DiscoveredTable[]>;
       options = {};
     }
     if (!cb) {
