@@ -51,7 +51,6 @@ export class Sqlite3Connector implements Connector {
     }
     this.pool = new SqlConnectionPool();
     this.metaModels = new MetaModelFactory();
-    Sqlite3Connector.connectors.add(this);
   }
 
   /* istanbul ignore next */
@@ -234,12 +233,6 @@ export class Sqlite3Connector implements Connector {
   // model definitions
   // -------------------------------------------------------------------------------------
 
-  /*
-  getMetaModel(modelName: string, lbModelDef: ModelDefinition, recreate?: boolean): MetaModel {
-    throw new Error(`not implemented yet`);
-    // return this.metaModels.getMetaModel(modelName, lbModelDef, recreate);
-  }
-  */
 
   getMetaModelFromJuggler(modelName: string, lbModelDef: any, recreate?: boolean): MetaModel {
     return this.metaModels.getMetaModelFromJuggler(modelName, lbModelDef, recreate);
@@ -290,6 +283,4 @@ export class Sqlite3Connector implements Connector {
 
     return connectorSettings as Sqlite3AllSettings;
   }
-
-  static connectors: WeakSet<Sqlite3Connector> = new WeakSet<Sqlite3Connector>();
 }

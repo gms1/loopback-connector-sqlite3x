@@ -10,7 +10,7 @@ import {expect} from '@loopback/testlab';
 import * as ConnectorModule from '../../..';
 import {Sqlite3JugglerConnector} from '../../..';
 
-describe('sqlite3-crud-connector: DefaultCrudRepository', () => {
+describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
   let ds: juggler.DataSource;
 
   // NOTE: from this ModelDefinition, the juggler bridge will create an
