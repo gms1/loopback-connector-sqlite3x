@@ -144,7 +144,7 @@ describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
     await repo.create({title: 't3', content: 'c3'});
     await repo.create({title: 't4', content: 'c4'});
     const result = await repo.deleteAll({title: 't3'});
-    expect(result).to.eql(1);
+    expect(result.count).to.eql(1);
   });
 
   it('implements Repository.updateById()', async () => {
@@ -171,7 +171,7 @@ describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
     await repo.create({title: 't3', content: 'c3'});
     await repo.create({title: 't4', content: 'c4'});
     const result = await repo.updateAll({content: 'c5'}, {});
-    expect(result).to.eql(2);
+    expect(result.count).to.eql(2);
     const notes = await repo.find({where: {title: 't3'}});
     expect(notes[0].content).to.eql('c5');
   });
@@ -181,7 +181,7 @@ describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
     await repo.create({title: 't3', content: 'c3'});
     await repo.create({title: 't4', content: 'c4'});
     const result = await repo.updateAll({content: 'c5'});
-    expect(result).to.eql(2);
+    expect(result.count).to.eql(2);
     const notes = await repo.find();
     const titles = notes.map((n) => `${n.title}:${n.content}`);
     expect(titles).to.deepEqual(['t3:c5', 't4:c5']);
@@ -192,7 +192,7 @@ describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
     await repo.create({title: 't3', content: 'c3'});
     await repo.create({title: 't4', content: 'c4'});
     const result = await repo.count();
-    expect(result).to.eql(2);
+    expect(result.count).to.eql(2);
   });
 
   it('implements Repository.save() without id', async () => {

@@ -92,8 +92,8 @@ describe('core: connections', () => {
   });
 
 
-  it('should fail to insert into not existing table', async () => {
-    const connector = new Sqlite3Connector({poolMin: 2});
+  it('should fail to insert into not existing table and forcibly close one open connection', async () => {
+    const connector = new Sqlite3Connector({poolMin: 2, poolMax: 10});
     await connector.connect();
     should(connector.pool.isOpen()).be.true();
     const connection = await connector.getConnection();
@@ -102,8 +102,11 @@ describe('core: connections', () => {
       should.should.fail();
     } catch (err) {
     }
+    should(connector.pool.openSize).be.eql(1);
     await connector.disconnect();
     should(connector.pool.isOpen()).be.false();
+    should(connector.pool.openSize).be.eql(0);
+    should(connection.isOpen()).be.false();
     await connector.disconnect();
   });
 
