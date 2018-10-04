@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.0-beta.2
+
+* maintenance
+
 ## 1.0.0-beta.1
 
 * **Features**
