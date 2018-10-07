@@ -1,6 +1,5 @@
 
 // tslint:disable no-require-imports member-ordering no-implicit-dependencies
-import {Connector} from '@loopback/repository';
 import _sg = require('strong-globalize');
 import * as _dbg from 'debug';
 import {
@@ -23,7 +22,7 @@ const SQLITE3_CONNECTOR_DESCRIPTION = g.f('unofficial LoopBack connector for SQL
 const debug = _dbg('sqlite3x');
 
 
-export class Sqlite3Connector implements Connector {
+export class Sqlite3Connector {
   readonly name: string = SQLITE3_CONNECTOR_NAME;
 
   readonly settings: Sqlite3AllSettings;

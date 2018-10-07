@@ -10,7 +10,6 @@ import {table, field, id, schema, fk} from 'sqlite3orm';
 import {DataSource} from 'loopback-datasource-juggler';
 import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
 import {DiscoveredTable, DiscoveredSchema} from '../../../discovery-service';
-import {expect} from '@loopback/testlab';
 
 describe('sqlite3-juggler-connector: discover model', () => {
   let ds: DataSource;
@@ -168,7 +167,6 @@ describe('sqlite3-juggler-connector: discover model', () => {
             done(`nothing found`);
             return;
           }
-          console.log(`discovered model defs: `, JSON.stringify(data));
           data.filter((item: any) => item.name.indexOf('DISCOVER') === 0).length.should.be.eql(2);
           done();
         });
@@ -185,7 +183,6 @@ describe('sqlite3-juggler-connector: discover model', () => {
             done(`nothing found`);
             return;
           }
-          console.log(`discovered schema defs: `, JSON.stringify(data));
           data.length.should.be.greaterThan(0);
           done();
         });
