@@ -29,6 +29,14 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
   
 ## Installation
 
+for loopback 3 it is recommended to use:
+
+```shell
+npm install loopback-connector-sqlite3x@<2.0 --save
+```
+
+for loopback 4 please use:
+
 ```shell
 npm install loopback-connector-sqlite3x --save
 ```
