@@ -8,7 +8,7 @@ import {Sqlite3JugglerConnector} from '../../..';
 import {initJugglerDataSource} from '../core/test-init';
 
 
-describe('sqlite3-juggler-connector: juggler imported tests', () => {
+xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
 
   before(async () => {
     // NOTE: these tests would fail without setting propertyValueForNULL to null:
