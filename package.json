@@ -71,9 +71,9 @@
     "strong-globalize": "^4.1.2"
   },
   "devDependencies": {
-    "@loopback/repository": "^0.20.0",
+    "@loopback/repository": "^0.21.1",
     "@loopback/testlab": "^0.15.0",
-    "@types/debug": "^0.0.30",
+    "@types/debug": "^0.0.31",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.11.4",
     "@types/rc": "^0.0.1",
