@@ -25,7 +25,6 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 
 * improve test coverage
 * LB4 support: better sqlite3orm integration: share/sync model definitions for entities
-* LB4 support: CrudConnector (if we gain any advantage)
   
 ## Installation
 

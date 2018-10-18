@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.0.1
+
+* maintenance release for lb4 support
+
+## 1.0.1
+
+* maintenance release for lb3 support
+
 ## 1.0.0-beta.2
 
 * maintenance
