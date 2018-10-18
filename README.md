@@ -29,7 +29,6 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
   
 ## Installation
 
-
 for loopback 3 it is recommended to use:
 
 ```shell
@@ -41,7 +40,6 @@ for loopback 4 please use:
 ```shell
 npm install loopback-connector-sqlite3x --save
 ```
-
 
 ## Connector settings
 
@@ -89,10 +87,10 @@ export interface Sqlite3AllSettings {
 
 /*
  * additional database settings
- * 
+ *
  *  for a description of the pragma setting see: https://www.sqlite.org/pragma.html
  *  for a description of the execution mode see: https://github.com/mapbox/node-sqlite3/wiki/Control-Flow
- * 
+ *
  * defaults:
  *   journalMode 'WAL'
  *   busyTimout = 3000
@@ -197,7 +195,6 @@ You can use the 'sqlite3x' property to specify additional database-specific opti
 | Date | INTEGER milliseconds since Jan 01 1970 |
 | String | TEXT |
 | JSON / Complex types | TEXT in JSON format |
-
 
 ### indexes
 
