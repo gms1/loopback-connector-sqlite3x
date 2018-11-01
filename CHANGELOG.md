@@ -1,10 +1,10 @@
 # CHANGELOG
 
-## 2.0.1
+## 2.0.1-2.0.2
 
 * maintenance release for lb4 support
 
-## 1.0.1
+## 1.0.1-1.0.2
 
 * maintenance release for lb3 support
 

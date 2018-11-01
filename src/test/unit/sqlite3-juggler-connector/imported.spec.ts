@@ -9,7 +9,6 @@ import {initJugglerDataSource} from '../core/test-init';
 
 
 xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
-
   before(async () => {
     // NOTE: these tests would fail without setting propertyValueForNULL to null:
     //  .) datatypes/model option persistUndefinedAsNull/should convert undefined to null on save
@@ -24,11 +23,11 @@ xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
     if (!ds.connected) {
       await ds.connect();
     }
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+    should(ds.connector).be.instanceof(Sqlite3JugglerConnector);
   });
 
   beforeEach(async () => {
-    const connection = await(global as any).getSchema().connector.pool.get();
+    const connection = await (global as any).getSchema().connector.pool.get();
     // TODO: this should not be required:
     await connection.exec('DROP TABLE IF EXISTS author');
     connection.close();
@@ -36,12 +35,12 @@ xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
 
   // ===========================================================
   require('loopback-datasource-juggler/test/common.batch.js');
-  require('loopback-datasource-juggler/test/include.test.js');
+  // require('loopback-datasource-juggler/test/include.test.js');
   // ===========================================================
 
   after(async () => {
     const ds = (global as any).getSchema();
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+    should(ds.connector).be.instanceof(Sqlite3JugglerConnector);
     const connector = ds.connector as Sqlite3JugglerConnector;
     for (const modelName of connector.modelNames()) {
       await connector.dropTable(modelName);
