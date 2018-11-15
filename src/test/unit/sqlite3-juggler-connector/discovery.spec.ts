@@ -168,7 +168,7 @@ describe('sqlite3-juggler-connector: discover model', () => {
             done(`nothing found`);
             return;
           }
-          console.log(`discovered model defs: `, JSON.stringify(data));
+          // console.log(`discovered model defs: `, JSON.stringify(data));
           data.filter((item: any) => item.name.indexOf('DISCOVER') === 0).length.should.be.eql(2);
           done();
         });
@@ -185,7 +185,7 @@ describe('sqlite3-juggler-connector: discover model', () => {
             done(`nothing found`);
             return;
           }
-          console.log(`discovered schema defs: `, JSON.stringify(data));
+          // console.log(`discovered schema defs: `, JSON.stringify(data));
           data.length.should.be.greaterThan(0);
           done();
         });

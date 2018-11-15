@@ -65,16 +65,16 @@
   "dependencies": {
     "debug": "^4.1.0",
     "loopback-connector": "^4.5.1",
-    "loopback-datasource-juggler": "^4.2.1",
+    "loopback-datasource-juggler": "^4.3.0",
     "sqlite3orm": "^2.4.4",
     "strong-globalize": "^4.1.2"
   },
   "devDependencies": {
-    "@loopback/repository": "^1.0.3",
+    "@loopback/repository": "^1.0.4",
     "@loopback/testlab": "^1.0.1",
     "@types/debug": "^0.0.31",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.4",
+    "@types/node": "^10.12.8",
     "@types/rc": "^0.0.1",
     "@types/sinon": "^5.0.5",
     "@types/sqlite3": "^3.1.3",
