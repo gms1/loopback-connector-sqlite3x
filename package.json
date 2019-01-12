@@ -1,6 +1,6 @@
 {
   "name": "loopback-connector-sqlite3x",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "alternative LoopBack connector for SQLite3",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -44,7 +44,7 @@
     "coverage:report": "nyc report --reporter=text-lcov",
     "coverage:html": "nyc report --reporter=html",
     "coverage:coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "typedoc": "typedoc --options typedoc.json --tsconfig tsconfig.doc.json --out docs/typedoc/loopback-connector-sqlite3x --exclude 'src/test/**/*.*' src/",
+    "typedoc": "typedoc --options ./typedoc.json --tsconfig tsconfig.doc.json --out ./docs/typedoc/loopback-connector-sqlite3x --exclude \"src/test/**/*.*\" ./src/",
     "prepublishOnly": "echo \"ERROR: please use the dist-folder for publishing\" && exit 1",
     "release:build": "npm run clean && npm run build && npm run test:minimal && npm run lint && npm run _pubprep",
     "release:publish": "npm run typedoc && cd dist && npm --access public publish",
