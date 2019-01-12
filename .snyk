@@ -1,39 +1,9 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.12.0
+version: v1.13.3
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  'npm:chownr:20180731':
-    - sqlite3 > node-pre-gyp > tar > chownr:
-        reason: >-
-          no fix available and is only a build time dependency of the sqlite3
-          package
-        expires: '2019-09-03T20:52:37.868Z'
-      chownr:
-        reason: >-
-          no fix available and is only a build time dependency of the sqlite3
-          package
-        expires: '2019-09-03T20:52:37.868Z'
-    - node-pre-gyp > tar > chownr:
-        reason: >-
-          no fix available and is only a build time dependency of the sqlite3
-          package
-        expires: '2019-09-03T20:52:37.868Z'
+  SNYK-JS-CHOWNR-73502:
     - sqlite3orm > sqlite3 > node-pre-gyp > tar > chownr:
-        reason: >-
-          no fix available and is only a build time dependency of the sqlite3
-          package
-        expires: '2019-09-03T20:52:37.868Z'
-  'npm:mem:20180117':
-    - strong-globalize > os-locale > mem:
-        reason: waiting for strong-globalize to fix this issue
-        expires: '2019-09-03T20:52:37.868Z'
-    - loopback-connector > strong-globalize > os-locale > mem:
-        reason: waiting for strong-globalize to fix this issue
-        expires: '2019-09-03T20:52:37.868Z'
-    - loopback-datasource-juggler > strong-globalize > os-locale > mem:
-        reason: waiting for strong-globalize to fix this issue
-        expires: '2019-09-03T20:52:37.868Z'
-    - loopback-datasource-juggler > loopback-connector > strong-globalize > os-locale > mem:
-        reason: waiting for strong-globalize to fix this issue
-        expires: '2019-09-03T20:52:37.868Z'
+        reason: only dev-dependency and no fix available
+        expires: '2020-01-11T08:15:18.439Z'
 patch: {}
