@@ -1,5 +1,4 @@
-
-import {Callback, PromiseOrVoid} from 'loopback-datasource-juggler';
+import { Callback, PromiseOrVoid } from 'loopback-datasource-juggler';
 
 function callbackOnNextTick<T>(cb?: Callback<T>, err?: Error, val?: T): void {
   if (cb) {
@@ -12,14 +11,14 @@ function callbackOnNextTick<T>(cb?: Callback<T>, err?: Error, val?: T): void {
 // if callback then call the callback from promise on next-tick
 // always return void
 export function callbackify<T>(promise: Promise<T>, cb: Callback<T>): void {
-  promise.then((val) => callbackOnNextTick(cb, undefined, val))
-      .catch((err) => callbackOnNextTick(cb, err));
+  promise
+    .then((val) => callbackOnNextTick(cb, undefined, val))
+    .catch((err) => callbackOnNextTick(cb, err));
 }
 
 // if callback then call the callback and return void
 // otherwise return the promise
-export function callbackifyOrPromise<T>(
-    promise: Promise<T>, cb?: Callback): PromiseOrVoid {
+export function callbackifyOrPromise<T>(promise: Promise<T>, cb?: Callback): PromiseOrVoid {
   if (cb) {
     callbackify(promise, cb);
     // tslint:disable-next-line return-undefined

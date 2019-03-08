@@ -3,10 +3,9 @@
 
 import * as should from 'should';
 
-import {Sqlite3JugglerConnector} from '../../..';
+import { Sqlite3JugglerConnector } from '../../..';
 
-import {initJugglerDataSource} from '../core/test-init';
-
+import { initJugglerDataSource } from '../core/test-init';
 
 xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
   before(async () => {
@@ -17,7 +16,7 @@ xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
     //  .) relations/embedsOne/should delete the embedded document and also update parent
 
     // tslint:disable-next-line no-null-keyword
-    initJugglerDataSource({propertyValueForNULL: null});
+    initJugglerDataSource({ propertyValueForNULL: null });
 
     const ds = (global as any).getSchema();
     if (!ds.connected) {
