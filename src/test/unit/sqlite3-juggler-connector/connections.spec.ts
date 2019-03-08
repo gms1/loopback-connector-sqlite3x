@@ -1,18 +1,16 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable no-duplicate-imports
 // tslint:disable await-promise
-import {DataSource} from 'loopback-datasource-juggler';
+import { DataSource } from 'loopback-datasource-juggler';
 import * as should from 'should';
 
 import * as ConnectorModule from '../../..';
-import {SQL_OPEN_READWRITE, Sqlite3JugglerConnector} from '../../..';
-
+import { SQL_OPEN_READWRITE, Sqlite3JugglerConnector } from '../../..';
 
 describe('sqlite3-juggler-connector: connections', () => {
-
   it('should connect using default settings', async () => {
     const ds = new DataSource(ConnectorModule as any);
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+    should(ds.connector).be.instanceof(Sqlite3JugglerConnector);
     const connector = ds.connector as Sqlite3JugglerConnector;
     ds.should.be.equal(connector.dataSource);
 
@@ -26,9 +24,13 @@ describe('sqlite3-juggler-connector: connections', () => {
   });
 
   it('should fail to connect to wrong db file (lazyConnect and connect() having callback)', async () => {
-    const ds = new DataSource(ConnectorModule as any, {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
-    const connector = (ds.connector as Sqlite3JugglerConnector);
+    const ds = new DataSource(ConnectorModule as any, {
+      file: '::/.',
+      mode: SQL_OPEN_READWRITE,
+      lazyConnect: true,
+    });
+    should(ds.connector).be.instanceof(Sqlite3JugglerConnector);
+    const connector = ds.connector as Sqlite3JugglerConnector;
     ds.should.be.equal(connector.dataSource);
 
     try {
@@ -45,27 +47,27 @@ describe('sqlite3-juggler-connector: connections', () => {
       await p;
       should.should.fail();
       return;
-    } catch (err) {
-    }
+    } catch (err) {}
     should(connector.pool.isOpen()).be.false();
     try {
       await ds.ping();
       should.should.fail();
       return;
-    } catch (err) {
-    }
+    } catch (err) {}
     try {
       await ds.disconnect();
       should.should.fail();
       return;
-    } catch (err) {
-    }
+    } catch (err) {}
   });
 
-
   it('should fail to connect to wrong db file (lazyConnect and connect() returning promise)', async () => {
-    const ds = new DataSource(ConnectorModule as any, {file: '::/.', mode: SQL_OPEN_READWRITE, lazyConnect: true});
-    should(ds.connector).be.instanceof (Sqlite3JugglerConnector);
+    const ds = new DataSource(ConnectorModule as any, {
+      file: '::/.',
+      mode: SQL_OPEN_READWRITE,
+      lazyConnect: true,
+    });
+    should(ds.connector).be.instanceof(Sqlite3JugglerConnector);
     const connector = ds.connector as Sqlite3JugglerConnector;
     ds.should.be.equal(connector.dataSource);
 
@@ -73,23 +75,17 @@ describe('sqlite3-juggler-connector: connections', () => {
       await connector.connect();
       should.should.fail();
       return;
-    } catch (err) {
-    }
+    } catch (err) {}
     should(connector.pool.isOpen()).be.false();
     try {
       await ds.ping();
       should.should.fail();
       return;
-    } catch (err) {
-    }
+    } catch (err) {}
     try {
       await ds.disconnect();
       should.should.fail();
       return;
-    } catch (err) {
-    }
+    } catch (err) {}
   });
-
-
-
 });

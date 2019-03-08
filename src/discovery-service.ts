@@ -1,12 +1,16 @@
-import {SqlConnectionPool, SqlDatabase, DbCatalogDAO} from 'sqlite3orm';
-import {Sqlite3ModelOptions, Sqlite3PropertyOptions, Sqlite3ForeignKeyOptions} from './sqlite3-options';
-import {CamelCase, camelCase} from './utils/string-utils';
+import { SqlConnectionPool, SqlDatabase, DbCatalogDAO } from 'sqlite3orm';
+import {
+  Sqlite3ModelOptions,
+  Sqlite3PropertyOptions,
+  Sqlite3ForeignKeyOptions,
+} from './sqlite3-options';
+import { CamelCase, camelCase } from './utils/string-utils';
 
 export interface SchemaProperty {
   type?: string;
   required?: boolean;
-  id?: 0|1;
-  generated?: 0|1;
+  id?: 0 | 1;
+  generated?: 0 | 1;
   sqlite3x?: Sqlite3PropertyOptions;
 }
 
@@ -19,16 +23,17 @@ export interface RelationOptions {
 export interface Schema {
   name: string;
   options: {
-    idInjection: boolean,
-    sqlite3x?: Sqlite3ModelOptions,
-    foreignKeys?: {[key: string]: Sqlite3ForeignKeyOptions},
-    relations?: {[key: string]: RelationOptions},
+    idInjection: boolean;
+    sqlite3x?: Sqlite3ModelOptions;
+    foreignKeys?: { [key: string]: Sqlite3ForeignKeyOptions };
+    relations?: { [key: string]: RelationOptions };
   };
-  properties: {[key: string]: SchemaProperty};
+  properties: { [key: string]: SchemaProperty };
 }
 
-export interface Schemas { [key: string]: Schema; }
-
+export interface Schemas {
+  [key: string]: Schema;
+}
 
 export interface DiscoverSchemasOptions {
   owner?: string;
@@ -40,19 +45,16 @@ export interface DiscoverSchemasOptions {
   nameMapper?(type: string, name: string): string;
 }
 
-
 export interface DiscoveredSchema {
   catalog?: string;
   schema: string;
 }
 
 export interface DiscoveredTable {
-  type: 'table'|'view';
+  type: 'table' | 'view';
   name: string;
   owner: string;
 }
-
-
 
 export function defaultNameMapper(type: string, input: string): string {
   if (type === 'table' || type === 'model') {
@@ -66,14 +68,14 @@ export class DiscoveryService {
   constructor(private readonly pool: SqlConnectionPool) {}
 
   async schemas(): Promise<DiscoveredSchema[]> {
-    let sqldb: SqlDatabase|undefined;
+    let sqldb: SqlDatabase | undefined;
     try {
       sqldb = await this.pool.get();
       const dao = new DbCatalogDAO(sqldb);
       const res: DiscoveredSchema[] = [];
       const schemas = await dao.readSchemas();
       schemas.forEach((schemaName) => {
-        res.push({schema: schemaName});
+        res.push({ schema: schemaName });
       });
       return res;
     } catch (err) {
@@ -82,21 +84,20 @@ export class DiscoveryService {
       if (sqldb) {
         try {
           await sqldb.close();
-        } catch (_ignore) {
-        }
+        } catch (_ignore) {}
       }
     }
   }
 
   async tables(schemaName: string): Promise<DiscoveredTable[]> {
-    let sqldb: SqlDatabase|undefined;
+    let sqldb: SqlDatabase | undefined;
     try {
       sqldb = await this.pool.get();
       const dao = new DbCatalogDAO(sqldb);
       const res: DiscoveredTable[] = [];
       const tables = await dao.readTables(schemaName);
       tables.forEach((name) => {
-        res.push({type: 'table', name, owner: schemaName});
+        res.push({ type: 'table', name, owner: schemaName });
       });
       return res;
     } catch (err) {
@@ -105,14 +106,17 @@ export class DiscoveryService {
       if (sqldb) {
         try {
           await sqldb.close();
-        } catch (_ignore) {
-        }
+        } catch (_ignore) {}
       }
     }
   }
 
-  async table(tableName: string, schemaName?: string, options?: DiscoverSchemasOptions): Promise<Schema> {
-    let sqldb: SqlDatabase|undefined;
+  async table(
+    tableName: string,
+    schemaName?: string,
+    options?: DiscoverSchemasOptions,
+  ): Promise<Schema> {
+    let sqldb: SqlDatabase | undefined;
     try {
       sqldb = await this.pool.get();
       const dao = new DbCatalogDAO(sqldb);
@@ -120,9 +124,12 @@ export class DiscoveryService {
       if (!tableInfo) {
         return Promise.reject(`table ${schemaName}.${tableName} not found`);
       }
-      const autoId = tableInfo.autoIncrement && tableInfo.primaryKey.length === 1 ? tableInfo.primaryKey[0] : undefined;
+      const autoId =
+        tableInfo.autoIncrement && tableInfo.primaryKey.length === 1
+          ? tableInfo.primaryKey[0]
+          : undefined;
 
-      const pkCols: {[key: string]: number} = {};
+      const pkCols: { [key: string]: number } = {};
       let keySeq = 1;
       tableInfo.primaryKey.forEach((colName: string) => {
         pkCols[colName] = keySeq;
@@ -133,15 +140,16 @@ export class DiscoveryService {
         name: options && options.nameMapper ? options.nameMapper('table', tableName) : tableName,
         options: {
           idInjection: false,
-          sqlite3x: {tableName: tableInfo.name},
+          sqlite3x: { tableName: tableInfo.name },
         },
         properties: {},
       };
 
-      const cols: {[key: string]: string} = {};
+      const cols: { [key: string]: string } = {};
       Object.keys(tableInfo.columns).forEach((colName) => {
         const colInfo = tableInfo.columns[colName];
-        const propName = options && options.nameMapper ? options.nameMapper('column', colName) : colName;
+        const propName =
+          options && options.nameMapper ? options.nameMapper('column', colName) : colName;
         schema.properties[propName] = {
           type: this.propertyType(colInfo.typeAffinity),
           required: colInfo.notNull ? true : false,
@@ -151,7 +159,7 @@ export class DiscoveryService {
 
             dataType: colInfo.typeAffinity,
             nullable: colInfo.notNull ? 'N' : 'Y',
-          }
+          },
         };
         if (pkCols[colName]) {
           schema.properties[propName].id = 1;
@@ -180,12 +188,10 @@ export class DiscoveryService {
       if (sqldb) {
         try {
           await sqldb.close();
-        } catch (_ignore) {
-        }
+        } catch (_ignore) {}
       }
     }
   }
-
 
   protected propertyType(type: string): string {
     // 'Date' and 'Boolean' not detectable

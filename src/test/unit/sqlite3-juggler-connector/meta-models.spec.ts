@@ -2,13 +2,11 @@
 // tslint:disable await-promise
 import * as should from 'should';
 
-
 // todo: test index definitions using standard, shortened and MySql form
 // todo: test foreignKeys
-import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
-import {DataSource} from 'loopback-datasource-juggler';
-import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
-
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { DataSource } from 'loopback-datasource-juggler';
+import { Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';
 
 describe('sqlite3-juggler-connector: meta model', () => {
   let ds: DataSource;
@@ -44,21 +42,21 @@ describe('sqlite3-juggler-connector: meta model', () => {
         city: String,
         state: String,
         zipCode: String,
-      }
+      },
     };
 
     const testSchema = {
       name: 'TestModel',
-      options: {idInjection: false, sqlite3x: {tableName: 'TEST_TABLE'}},
+      options: { idInjection: false, sqlite3x: { tableName: 'TEST_TABLE' } },
       properties: {
-        id: {type: 'Number', id: 1},
-        num: {type: 'Number'},
-        bool: {type: 'Boolean'},
-        date: {type: 'Date'},
-        str: {type: 'String'},
-        obj: {type: 'Address'},
-        array: [{type: 'String'}]
-      }
+        id: { type: 'Number', id: 1 },
+        num: { type: 'Number' },
+        bool: { type: 'Boolean' },
+        date: { type: 'Date' },
+        str: { type: 'String' },
+        obj: { type: 'Address' },
+        array: [{ type: 'String' }],
+      },
     };
 
     const models: any = db.modelBuilder.buildModels([addressSchema, testSchema]);
@@ -71,7 +69,6 @@ describe('sqlite3-juggler-connector: meta model', () => {
     }
     const ts = new Date();
     ts.setUTCMilliseconds(0);
-
 
     const model1 = new testModel();
     model1.num = 42;
@@ -88,7 +85,7 @@ describe('sqlite3-juggler-connector: meta model', () => {
 
     const model2 = await model1.save();
 
-    const model3 = await testModel.findOne({where: {id: model2.id}});
+    const model3 = await testModel.findOne({ where: { id: model2.id } });
 
     model3.should.have.property('id', model2.id);
     model3.should.have.property('num', model2.num);
@@ -100,9 +97,7 @@ describe('sqlite3-juggler-connector: meta model', () => {
     model3.obj.should.have.property('city', model2.obj.city);
     model3.obj.should.have.property('state', model2.obj.state);
     model3.obj.should.have.property('zipCode', model2.obj.zipCode);
-
   });
-
 
   // ==============================================================================
   it('standard index definition', async () => {
@@ -110,8 +105,8 @@ describe('sqlite3-juggler-connector: meta model', () => {
       name: 'TestModel',
       options: {
         idInjection: false,
-        sqlite3x: {tableName: 'TEST_TABLE'},
-        indexes: {testIdx: {options: {unique: 1}, keys: {col1: 1, col2: -1}}}
+        sqlite3x: { tableName: 'TEST_TABLE' },
+        indexes: { testIdx: { options: { unique: 1 }, keys: { col1: 1, col2: -1 } } },
       },
       properties: {
         id: {
@@ -120,11 +115,11 @@ describe('sqlite3-juggler-connector: meta model', () => {
           sqlite3x: {
             columnName: 'ID',
             dbtype: 'INTEGER NOT NULL',
-          }
+          },
         },
-        col1: {type: 'String'},
-        col2: {type: 'String'}
-      }
+        col1: { type: 'String' },
+        col2: { type: 'String' },
+      },
     };
 
     const models: any = db.modelBuilder.buildModels(testSchema);
@@ -142,7 +137,6 @@ describe('sqlite3-juggler-connector: meta model', () => {
     } catch (err) {
       should.not.exists(err);
     }
-
   });
 
   // ==============================================================================
@@ -151,18 +145,18 @@ describe('sqlite3-juggler-connector: meta model', () => {
       name: 'TestModel',
       options: {
         idInjection: false,
-        sqlite3x: {tableName: 'TEST_TABLE'},
-        indexes: {testIdx: {col1: 1, col2: -1}},
+        sqlite3x: { tableName: 'TEST_TABLE' },
+        indexes: { testIdx: { col1: 1, col2: -1 } },
       },
       properties: {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'},
+          sqlite3x: { columnName: 'ID', dbtype: 'INTEGER NOT NULL' },
         },
-        col1: {type: 'String'},
-        col2: {type: 'String'}
-      }
+        col1: { type: 'String' },
+        col2: { type: 'String' },
+      },
     };
 
     const models: any = db.modelBuilder.buildModels(testSchema);
@@ -180,7 +174,6 @@ describe('sqlite3-juggler-connector: meta model', () => {
     } catch (err) {
       should.not.exists(err);
     }
-
   });
 
   // ==============================================================================
@@ -189,18 +182,18 @@ describe('sqlite3-juggler-connector: meta model', () => {
       name: 'TestModel',
       options: {
         idInjection: false,
-        sqlite3x: {tableName: 'TEST_TABLE'},
-        indexes: {testIdx: {columns: ' col1 , col2 ', kind: 'unique'}}
+        sqlite3x: { tableName: 'TEST_TABLE' },
+        indexes: { testIdx: { columns: ' col1 , col2 ', kind: 'unique' } },
       },
       properties: {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'},
+          sqlite3x: { columnName: 'ID', dbtype: 'INTEGER NOT NULL' },
         },
-        col1: {type: 'String'},
-        col2: {type: 'String'}
-      }
+        col1: { type: 'String' },
+        col2: { type: 'String' },
+      },
     };
 
     const models: any = db.modelBuilder.buildModels(testSchema);
@@ -218,58 +211,55 @@ describe('sqlite3-juggler-connector: meta model', () => {
     } catch (err) {
       should.not.exists(err);
     }
-
   });
-
 
   // ==============================================================================
   it('foreign key constraint definition', async () => {
     const parentSchema = {
       name: 'TestParentModel',
-      options: {sqlite3x: {tableName: 'TEST_PARENT_TABLE'}},
+      options: { sqlite3x: { tableName: 'TEST_PARENT_TABLE' } },
       properties: {
         id1: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'IDP1', dbtype: 'INTEGER NOT NULL'},
+          sqlite3x: { columnName: 'IDP1', dbtype: 'INTEGER NOT NULL' },
         },
         id2: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'IDP2', dbtype: 'INTEGER NOT NULL'},
-        }
-      }
-
+          sqlite3x: { columnName: 'IDP2', dbtype: 'INTEGER NOT NULL' },
+        },
+      },
     };
     const testSchema = {
       name: 'TestModel',
       options: {
         idInjection: false,
-        sqlite3x: {tableName: 'TEST_TABLE'},
+        sqlite3x: { tableName: 'TEST_TABLE' },
         foreignKeys: {
           fk: {
             name: 'toParent',
             properties: 'parentId1, parentId2',
             refColumns: ' IDP1 , IDP2 ',
-            refTable: 'TEST_PARENT_TABLE'
-          }
-        }
+            refTable: 'TEST_PARENT_TABLE',
+          },
+        },
       },
       properties: {
         id: {
           type: 'Number',
           id: 1,
-          sqlite3x: {columnName: 'IDC', dbtype: 'INTEGER NOT NULL'},
+          sqlite3x: { columnName: 'IDC', dbtype: 'INTEGER NOT NULL' },
         },
         parentId1: {
           type: 'Number',
-          sqlite3x: {columnName: 'C2P1', dbtype: 'INTEGER'},
+          sqlite3x: { columnName: 'C2P1', dbtype: 'INTEGER' },
         },
         parentId2: {
           type: 'Number',
-          sqlite3x: {columnName: 'C2P2', dbtype: 'INTEGER'},
-        }
-      }
+          sqlite3x: { columnName: 'C2P2', dbtype: 'INTEGER' },
+        },
+      },
     };
 
     const models: any = db.modelBuilder.buildModels([parentSchema, testSchema]);
@@ -290,10 +280,7 @@ describe('sqlite3-juggler-connector: meta model', () => {
     } catch (err) {
       should.not.exists(err);
     }
-
   });
-
-
 
   // ==============================================================================
   it('autoIncrement from generated', async () => {
@@ -301,16 +288,16 @@ describe('sqlite3-juggler-connector: meta model', () => {
       name: 'TestModel',
       options: {
         idInjection: false,
-        sqlite3x: {tableName: 'TEST_TABLE'},
+        sqlite3x: { tableName: 'TEST_TABLE' },
       },
       properties: {
         id: {
           type: 'Number',
           id: 1,
           generated: 1,
-          sqlite3x: {columnName: 'IDC', dbtype: 'INTEGER NOT NULL'},
+          sqlite3x: { columnName: 'IDC', dbtype: 'INTEGER NOT NULL' },
         },
-      }
+      },
     };
 
     const models: any = db.modelBuilder.buildModels([testSchema]);
@@ -325,6 +312,4 @@ describe('sqlite3-juggler-connector: meta model', () => {
     const table = metaModel.table;
     table.isAutoIncrementDefined.should.be.true();
   });
-
-
 });

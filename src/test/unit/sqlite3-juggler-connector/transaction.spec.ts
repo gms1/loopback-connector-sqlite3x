@@ -1,13 +1,11 @@
 // tslint:disable no-require-imports no-implicit-dependencies
 // tslint:disable await-promise
-import {SqlDatabase} from 'sqlite3orm';
+import { SqlDatabase } from 'sqlite3orm';
 
-import {Transaction} from '../../../lc-import';
-import {getDefaultDataSource, getDefaultConnector} from '../core/test-init';
-import {Sqlite3JugglerConnector} from '../../..';
-import {DataSource} from 'loopback-datasource-juggler';
-
-
+import { Transaction } from '../../../lc-import';
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { Sqlite3JugglerConnector } from '../../..';
+import { DataSource } from 'loopback-datasource-juggler';
 
 describe('sqlite3-juggler-connector: transaction', () => {
   let ds: DataSource;
@@ -40,7 +38,6 @@ describe('sqlite3-juggler-connector: transaction', () => {
     connector.destroyAllMetaModels();
     await connection.close();
   });
-
 
   function getTransaction(): Promise<Transaction> {
     return new Promise((resolve, reject) => {
@@ -83,10 +80,12 @@ describe('sqlite3-juggler-connector: transaction', () => {
       const tx = await getTransaction();
       let rows: any[];
 
-      await(tx.connection as SqlDatabase).run('INSERT INTO TEST (id, col) values (1, \'commit test\')');
+      await (tx.connection as SqlDatabase).run(
+        "INSERT INTO TEST (id, col) values (1, 'commit test')",
+      );
 
       // tx session should see newly inserted row
-      rows = await(tx.connection as SqlDatabase).all('SELECT id, col FROM TEST ORDER BY id');
+      rows = await (tx.connection as SqlDatabase).all('SELECT id, col FROM TEST ORDER BY id');
       rows.length.should.be.equal(1);
 
       // other sessions should not see newly inserted row
@@ -98,7 +97,6 @@ describe('sqlite3-juggler-connector: transaction', () => {
       // other sessions should see newly inserted row
       rows = await connection.all('SELECT id, col FROM TEST ORDER BY id');
       rows.length.should.be.equal(1);
-
     } catch (err) {
       err.should.fail();
     }
@@ -108,10 +106,12 @@ describe('sqlite3-juggler-connector: transaction', () => {
     const tx = await getTransaction();
     let rows: any[];
 
-    await(tx.connection as SqlDatabase).run('INSERT INTO TEST (id, col) values (2, \'rollback test\')');
+    await (tx.connection as SqlDatabase).run(
+      "INSERT INTO TEST (id, col) values (2, 'rollback test')",
+    );
 
     // tx session should see newly inserted row
-    rows = await(tx.connection as SqlDatabase).all('SELECT id, col FROM TEST ORDER BY id');
+    rows = await (tx.connection as SqlDatabase).all('SELECT id, col FROM TEST ORDER BY id');
     rows.length.should.be.equal(1);
 
     // other sessions should not see newly inserted row
@@ -125,12 +125,11 @@ describe('sqlite3-juggler-connector: transaction', () => {
     rows.length.should.be.equal(0);
   });
 
-
   it('basic transaction', async () => {
     const conn = await connector.beginTransaction();
     let rows: any[];
 
-    await conn.run('INSERT INTO TEST (id, col) values (1, \'commit test\')');
+    await conn.run("INSERT INTO TEST (id, col) values (1, 'commit test')");
     rows = await conn.all('SELECT id, col FROM TEST ORDER BY id');
     rows.length.should.be.equal(1);
     await connector.rollback(conn);

@@ -1,1 +1,1 @@
-export {callbackify, callbackifyOrPromise} from './promise-callback';
+export { callbackify, callbackifyOrPromise } from './promise-callback';

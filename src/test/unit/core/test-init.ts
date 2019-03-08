@@ -1,9 +1,8 @@
 // tslint:disable no-implicit-dependencies no-require-imports
-import {DataSource} from 'loopback-datasource-juggler';
-import {Sqlite3JugglerConnector} from '../../../sqlite3-juggler-connector';
+import { DataSource } from 'loopback-datasource-juggler';
+import { Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';
 
 import * as ConnectorModule from '../../..';
-
 
 let defaultDataSource: DataSource;
 
@@ -21,8 +20,6 @@ export function getDefaultDataSource(): DataSource {
   defaultDataSource = new DataSource(ConnectorModule as any, config);
   return defaultDataSource;
 }
-
-
 
 export function getDefaultConnector(): Sqlite3JugglerConnector {
   return getDefaultDataSource().connector as Sqlite3JugglerConnector;
@@ -51,7 +48,6 @@ export function initJugglerDataSource(config: any): DataSource {
   return jugglerDataSource;
 }
 
-
 // TODO: evaluate if additional features can be supported:
 glob.connectorCapabilities = {
   cloudantCompatible: false,
@@ -61,5 +57,5 @@ glob.connectorCapabilities = {
   get geoPoint(): boolean {
     return false;
   },
-  set geoPoint(val: boolean) {}
+  set geoPoint(val: boolean) {},
 };

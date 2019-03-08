@@ -1,5 +1,4 @@
-
-import {SqlDatabaseSettings} from 'sqlite3orm';
+import { SqlDatabaseSettings } from 'sqlite3orm';
 
 export interface Sqlite3AllSettings {
   name: string;

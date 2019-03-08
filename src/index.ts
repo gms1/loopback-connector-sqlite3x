@@ -16,5 +16,5 @@ export {
   SQL_OPEN_READONLY,
   SQL_OPEN_READWRITE,
   SqlDatabaseSettings,
-  ValueTransformer
+  ValueTransformer,
 } from 'sqlite3orm';
