@@ -1,16 +1,16 @@
 # CHANGELOG
 
-## 1.0.0-1.0.5
+## 1.0.0-1.0.6
 
-* maintenance
+- maintenance
 
 ## 1.0.0-beta.1
 
-* **Features**
-  * model-discovery
-  * auto-update
+- **Features**
+  - model-discovery
+  - auto-update
 
 ## 1.0.0-beta.0
 
-* **Features**
-  * initial release
+- **Features**
+  - initial release
