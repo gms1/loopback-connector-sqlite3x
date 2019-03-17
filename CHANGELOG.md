@@ -1,24 +1,24 @@
 # CHANGELOG
 
-## 2.0.1-2.0.5
+## 2.0.1-2.0.6
 
-* maintenance release for lb4 support
+- maintenance release for lb4 support
 
 ## 1.0.1-1.0.5
 
-* maintenance release for lb3 support
+- maintenance release for lb3 support
 
 ## 1.0.0-beta.2
 
-* maintenance
+- maintenance
 
 ## 1.0.0-beta.1
 
-* **Features**
-  * model-discovery
-  * auto-update
+- **Features**
+  - model-discovery
+  - auto-update
 
 ## 1.0.0-beta.0
 
-* **Features**
-  * initial release
+- **Features**
+  - initial release
