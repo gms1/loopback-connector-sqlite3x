@@ -11,15 +11,15 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 [![Coverage Status](https://coveralls.io/repos/github/gms1/loopback-connector-sqlite3x/badge.svg?branch=master&service=github)](https://coveralls.io/github/gms1/loopback-connector-sqlite3x?branch=master)
 [![DeepScan Grade](https://deepscan.io/api/projects/742/branches/1407/badge/grade.svg)](https://deepscan.io/dashboard/#view=project&pid=742&bid=1407)
 [![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
-[![Greenkeeper badge](https://badges.greenkeeper.io/gms1/loopback-connector-sqlite3x.svg)](https://greenkeeper.io/)
+[![Known Vulnerabilities](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x/badge.svg)](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x)
 
 ## Features
 
-* auto-migrate and auto-update for tables, indexes, foreign keys
-* model discovery
-* full control over the names for tables, fields, indexes and foreign key constraints in the mapped database schema
-* connection pool
-* all other features provided by [sqlite3orm](https://github.com/gms1/node-sqlite3-orm)
+- auto-migrate and auto-update for tables, indexes, foreign keys
+- model discovery
+- full control over the names for tables, fields, indexes and foreign key constraints in the mapped database schema
+- connection pool
+- all other features provided by [sqlite3orm](https://github.com/gms1/node-sqlite3-orm)
 
 ## Installation
 
@@ -81,10 +81,10 @@ export interface Sqlite3AllSettings {
 
 /*
  * additional database settings
- * 
+ *
  *  for a description of the pragma setting see: https://www.sqlite.org/pragma.html
  *  for a description of the execution mode see: https://github.com/mapbox/node-sqlite3/wiki/Control-Flow
- * 
+ *
  * defaults:
  *   journalMode 'WAL'
  *   busyTimout = 3000
@@ -182,20 +182,20 @@ You can use the 'sqlite3x' property to specify additional database-specific opti
 
 #### default type mapping
 
-| LoopBack type | Database type |
-|-----|-----|
-| Number| INTEGER if primary key, REAL otherwise |
-| Boolean | INTEGER 1 or 0 |
-| Date | INTEGER milliseconds since Jan 01 1970 |
-| String | TEXT |
-| JSON / Complex types | TEXT in JSON format |
-
+| LoopBack type        | Database type                          |
+| -------------------- | -------------------------------------- |
+| Number               | INTEGER if primary key, REAL otherwise |
+| Boolean              | INTEGER 1 or 0                         |
+| Date                 | INTEGER milliseconds since Jan 01 1970 |
+| String               | TEXT                                   |
+| JSON / Complex types | TEXT in JSON format                    |
 
 ### indexes
 
 you can define indexes using the loopback 'indexes' property in the standard or shortened form, as well as using the MySql form
 
 <!-- -->
+
 > NOTE: specifying indexes at the model property level is not supported
 
 ### foreign key constraints
