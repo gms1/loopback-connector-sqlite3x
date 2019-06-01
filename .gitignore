@@ -15,7 +15,7 @@ npm-debug.log*
 # compiled output:
 
 /dist
-/docs/typedoc
+/docs/loopback-connector-sqlite3x
 /.nyc_output
 /coverage
 
