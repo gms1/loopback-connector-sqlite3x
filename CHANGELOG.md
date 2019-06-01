@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.0.1-2.0.7
+## 2.0.1-2.0.8
 
 - maintenance release for lb4 support
 
