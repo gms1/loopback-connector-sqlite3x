@@ -1,0 +1,9 @@
+{
+  "name": "loopback-connector-sqlite3x",
+  "tsconfig": "tsconfig.json",
+  "output": "docs/loopback-connector-sqlite3x",
+  "theme": "vagrant",
+  "disablePrivate": true,
+  "disableProtected": true,
+  "disableInternal": true
+}
