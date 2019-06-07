@@ -630,18 +630,16 @@ export function initialize(dataSource: DataSource, cb?: Callback<void>): void {
       cb();
     } else {
       debug(`initial connect`);
-      connector.connect(
-        (err: any): void => {
-          /* istanbul ignore if */
-          if (err) {
-            debug(`initial connect failed: `, err);
-          } else {
-            debug(`initial connect succeeded`);
-          }
-          debug(`initialized ${SQLITE3_CONNECTOR_NAME} juggler connector`);
-          cb(err);
-        },
-      );
+      connector.connect((err: any): void => {
+        /* istanbul ignore if */
+        if (err) {
+          debug(`initial connect failed: `, err);
+        } else {
+          debug(`initial connect succeeded`);
+        }
+        debug(`initialized ${SQLITE3_CONNECTOR_NAME} juggler connector`);
+        cb(err);
+      });
       return;
     }
   }

@@ -200,9 +200,7 @@ export class MetaModelFactory {
             /* istanbul ignore if */
             if (!metaProp) {
               throw new Error(
-                `property '${propName}' not defined for model '${
-                  metaModel.name
-                }' but referenced in index definition '${indexName}'`,
+                `property '${propName}' not defined for model '${metaModel.name}' but referenced in index definition '${indexName}'`,
               );
             }
             idxDef.fields.push({
@@ -241,9 +239,7 @@ export class MetaModelFactory {
           /* istanbul ignore if */
           if (!metaProp) {
             throw new Error(
-              `property '${properties[i]}' not defined for model '${
-                metaModel.name
-              }' but referenced in foreign key definition '${constraintName}'`,
+              `property '${properties[i]}' not defined for model '${metaModel.name}' but referenced in foreign key definition '${constraintName}'`,
             );
           }
 
