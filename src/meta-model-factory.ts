@@ -28,22 +28,20 @@ interface MetaModelRef {
 
 export class MetaModelFactory {
   /**
-   * The one and only MetaModels instance
+   * The one and only MetaModelFactory instance
    *
    * @static
    */
   public static models: MetaModelFactory;
 
-  readonly name!: string;
   private mapNameToMetaModel!: Map<string, MetaModelRef>;
 
   /**
-   * Creates an instance of MetaModels.
+   * Creates an instance of MetaModelFactory.
    *
    */
   public constructor() {
     if (!MetaModelFactory.models) {
-      this.name = SQLITE3_CONNECTOR_NAME;
       this.mapNameToMetaModel = new Map<string, MetaModelRef>();
 
       // initialize the 'singleton'
@@ -88,7 +86,7 @@ export class MetaModelFactory {
     }
 
     const settings = lbModelDef.settings || {};
-    const modelOpts = (settings[this.name] || {}) as Sqlite3ModelOptions;
+    const modelOpts = (settings[SQLITE3_CONNECTOR_NAME] || {}) as Sqlite3ModelOptions;
     debug(`registering model '${modelName}'`);
     metaModelRef = { metaModel: new MetaModel(modelName), lbModelDef };
 
@@ -110,8 +108,8 @@ export class MetaModelFactory {
           // or table has a combined id
           tableOpts.autoIncrement = true;
         }
-        const propertyOpts = (property[this.name] || {}) as Sqlite3PropertyOptions;
-        property[this.name] = propertyOpts;
+        const propertyOpts = (property[SQLITE3_CONNECTOR_NAME] || {}) as Sqlite3PropertyOptions;
+        property[SQLITE3_CONNECTOR_NAME] = propertyOpts;
 
         const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
         if (
@@ -147,11 +145,11 @@ export class MetaModelFactory {
 
     Object.keys(properties).forEach((propName) => {
       const property = properties[propName];
-      if (!property[this.name] || property[this.name].transform) {
+      if (!property[SQLITE3_CONNECTOR_NAME] || property[SQLITE3_CONNECTOR_NAME].transform) {
         return;
       }
       const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
-      property[this.name].transform = metaProp.transform;
+      property[SQLITE3_CONNECTOR_NAME].transform = metaProp.transform;
     });
 
     // indexes:

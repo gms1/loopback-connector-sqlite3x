@@ -1,8 +1,13 @@
 // tslint:disable no-implicit-dependencies no-require-imports
 import { DataSource } from 'loopback-datasource-juggler';
-import { Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';
+import { initialize, Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';
 
-import * as ConnectorModule from '../../..';
+export const SQLITE3_MODULE = {
+  initialize,
+};
+
+// ================================================================
+// datasource for internal test cases:
 
 let defaultDataSource: DataSource;
 
@@ -13,11 +18,11 @@ export function getDefaultDataSource(): DataSource {
 
   const config: any = {
     name: `test`,
-    file: `test.db`,
+    file: `test_default.db`,
     poolMin: 5,
     poolMax: 20,
   };
-  defaultDataSource = new DataSource(ConnectorModule as any, config);
+  defaultDataSource = new DataSource(SQLITE3_MODULE, config);
   return defaultDataSource;
 }
 
@@ -26,10 +31,10 @@ export function getDefaultConnector(): Sqlite3JugglerConnector {
 }
 
 // ================================================================
-// for executing juggler imported tests:
+// datasource for executing juggler imported tests:
 
-const JUGGLER_TEST_DATABASE = 'test.db';
-const JUGGLER_DATASOURCE_NAME = 'test imports';
+const JUGGLER_TEST_DATABASE = 'test_juggler.db';
+const JUGGLER_DATASOURCE_NAME = 'imported juggler';
 
 let jugglerDataSource: DataSource;
 
@@ -44,7 +49,7 @@ export function initJugglerDataSource(config: any): DataSource {
   config = config || {};
   config.name = config.name || JUGGLER_DATASOURCE_NAME;
   config.file = config.file || JUGGLER_TEST_DATABASE;
-  jugglerDataSource = new DataSource(ConnectorModule as any, config);
+  jugglerDataSource = new DataSource(SQLITE3_MODULE, config);
   return jugglerDataSource;
 }
 

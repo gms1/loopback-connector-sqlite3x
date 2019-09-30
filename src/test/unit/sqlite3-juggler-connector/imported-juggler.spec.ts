@@ -7,7 +7,7 @@ import { Sqlite3JugglerConnector } from '../../..';
 
 import { initJugglerDataSource } from '../core/test-init';
 
-xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
+describe('sqlite3-juggler-connector: juggler imported tests', () => {
   before(async () => {
     // NOTE: these tests would fail without setting propertyValueForNULL to null:
     //  .) datatypes/model option persistUndefinedAsNull/should convert undefined to null on save
@@ -34,7 +34,7 @@ xdescribe('sqlite3-juggler-connector: juggler imported tests', () => {
 
   // ===========================================================
   require('loopback-datasource-juggler/test/common.batch.js');
-  // require('loopback-datasource-juggler/test/include.test.js');
+  require('loopback-datasource-juggler/test/include.test.js');
   // ===========================================================
 
   after(async () => {

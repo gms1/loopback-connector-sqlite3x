@@ -14,8 +14,8 @@ import {
 } from '@loopback/repository';
 import { expect } from '@loopback/testlab';
 
-import * as ConnectorModule from '../../..';
 import { Sqlite3JugglerConnector } from '../../..';
+import { SQLITE3_MODULE } from '../../unit/core/test-init';
 
 describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
   let ds: juggler.DataSource;
@@ -40,7 +40,7 @@ describe('sqlite3-juggler-connector: DefaultCrudRepository', () => {
   }
 
   before(async () => {
-    ds = new juggler.DataSource(ConnectorModule as any, { name: 'db' });
+    ds = new juggler.DataSource(SQLITE3_MODULE, { name: 'db' } as any);
     if (!ds.connected) {
       await ds.connect();
     }

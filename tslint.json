@@ -78,7 +78,7 @@
       true
     ],
     "no-for-in-array": true,
-    "no-implicit-dependencies": true,
+    "no-implicit-dependencies": [true, "dev"],
     "no-inferred-empty-object-type": true,
     "no-invalid-this": [
       true,
@@ -107,8 +107,6 @@
     "no-unsafe-any": false,
     "no-unsafe-finally": true,
     "no-unused-expression": true,
-    "no-unused-variable": true,
-    "no-use-before-declare": true,
     "no-var-keyword": true,
     "no-void-expression": false,
     "prefer-conditional-expression": false,
