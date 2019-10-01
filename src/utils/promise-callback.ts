@@ -1,11 +1,9 @@
 import { Callback, PromiseOrVoid } from 'loopback-datasource-juggler';
 
-function callbackOnNextTick<T>(cb?: Callback<T>, err?: Error, val?: T): void {
-  if (cb) {
-    process.nextTick(() => {
-      cb(err, val);
-    });
-  }
+function callbackOnNextTick<T>(cb: Callback<T>, err?: Error, val?: T): void {
+  process.nextTick(() => {
+    cb(err, val);
+  });
 }
 
 // if callback then call the callback from promise on next-tick
