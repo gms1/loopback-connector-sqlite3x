@@ -14,7 +14,6 @@ import { DiscoveredTable, DiscoveredSchema } from '../../../discovery-service';
 describe('sqlite3-juggler-connector: discover model', () => {
   let ds: DataSource;
   let connector: Sqlite3JugglerConnector;
-  let db: any;
 
   const TEST_PARENT_TABLE_NAME = 'DISCOVER_PARENT_MODEL';
   const TEST_CHILD_TABLE_NAME = 'DISCOVER_CHILD_MODEL';
