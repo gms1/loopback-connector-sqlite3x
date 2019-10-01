@@ -14,7 +14,6 @@ import {
 import { SQLITE3_CONNECTOR_NAME, Sqlite3Connector } from './sqlite3-connector';
 import { Sqlite3ModelOptions, Sqlite3PropertyOptions } from './sqlite3-options';
 import { Sqlite3Settings } from './sqlite3-settings';
-import { PropertyDefinition } from 'loopback-datasource-juggler';
 
 function debug(arg: any, ...args: any[]): void {
   Sqlite3Connector.debug(arg, ...args);
@@ -47,7 +46,7 @@ export class MetaModelFactory {
   }
 
   // required in Sqlite3JugglerConnector.fromColumnValue and Sqlite3JugglerConnector.toColumnValue
-  getValueTransformer(prop: PropertyDefinition): ValueTransformer | undefined {
+  getValueTransformer(prop: juggler.PropertyDefinition): ValueTransformer | undefined {
     return this.mapPropDefToTransform.get(prop);
   }
 
