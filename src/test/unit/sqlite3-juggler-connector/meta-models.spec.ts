@@ -4,7 +4,7 @@ import * as should from 'should';
 
 // todo: test index definitions using standard, shortened and MySql form
 // todo: test foreignKeys
-import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init.spec';
 import { DataSource } from 'loopback-datasource-juggler';
 import { Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';
 

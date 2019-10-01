@@ -4,7 +4,7 @@
 
 import * as should from 'should';
 
-import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init.spec';
 
 import { table, field, id, schema, fk } from 'sqlite3orm';
 import { DataSource } from 'loopback-datasource-juggler';

@@ -5,7 +5,7 @@ import * as should from 'should';
 
 import { Sqlite3JugglerConnector } from '../../..';
 
-import { initJugglerDataSource } from '../core/test-init';
+import { initJugglerDataSource } from '../core/test-init.spec';
 
 describe('sqlite3-juggler-connector: juggler imported tests', () => {
   before(async () => {

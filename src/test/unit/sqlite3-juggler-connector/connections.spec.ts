@@ -4,7 +4,7 @@
 import { DataSource } from 'loopback-datasource-juggler';
 import * as should from 'should';
 
-import { SQLITE3_MODULE } from '../core/test-init';
+import { SQLITE3_MODULE } from '../core/test-init.spec';
 import { SQL_OPEN_READWRITE, Sqlite3JugglerConnector } from '../../..';
 
 describe('sqlite3-juggler-connector: connections', () => {

@@ -42,9 +42,7 @@ function debug(arg: any, ...args: any[]): void {
  * juggler sql-connector
  */
 export class Sqlite3JugglerConnector extends SQLConnector implements TransactionMixin {
-  readonly name: string = SQLITE3_CONNECTOR_NAME;
-
-  private readonly connector: Sqlite3Connector;
+  readonly connector: Sqlite3Connector;
   readonly settings: Sqlite3AllSettings;
 
   get pool(): SqlConnectionPool {
@@ -219,9 +217,10 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
   }
 
   fromColumnValue(prop: PropertyDefinition, value: any): any {
+    const transform = this.connector.metaModels.getValueTransformer(prop);
     /* istanbul ignore else */
-    if (prop && prop[this.name] && prop[this.name].transform && prop[this.name].transform.fromDB) {
-      const v = prop[this.name].transform.fromDB(value); // using 'undefined' for NULL
+    if (transform) {
+      const v = transform.fromDB(value); // using 'undefined' for NULL
       return v !== undefined ? v : this.settings.propertyValueForNULL;
     }
     /* istanbul ignore next */
@@ -229,9 +228,10 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
   }
 
   toColumnValue(prop: PropertyDefinition, value: any): any {
+    const transform = this.connector.metaModels.getValueTransformer(prop);
     /* istanbul ignore else */
-    if (prop && prop[this.name] && prop[this.name].transform && prop[this.name].transform.toDB) {
-      return prop[this.name].transform.toDB(value);
+    if (transform) {
+      return transform.toDB(value);
     }
     /* istanbul ignore next */
     throw new Error(`something happened calling toColumnValue`);
@@ -585,6 +585,10 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
   // *************************************************************************************
   // model definitions
   // -------------------------------------------------------------------------------------
+  modelNames(): string[] {
+    const lbModelDef: any /* juggler.PersistedModelClass */ = (this as any)._models;
+    return lbModelDef ? Object.keys(lbModelDef) : [];
+  }
 
   getMetaModel(modelName: string, recreate?: boolean): MetaModel {
     const lbModelDef: any /* juggler.PersistedModelClass */ = (this as any)._models[modelName];
@@ -601,10 +605,6 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
 
   destroyAllMetaModels(): void {
     this.connector.destroyAllMetaModels();
-  }
-
-  modelNames(): string[] {
-    return this.connector.metaModels.modelNames();
   }
 }
 

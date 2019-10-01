@@ -4,7 +4,7 @@
 import * as should from 'should';
 import * as sinon from 'sinon';
 
-import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init.spec';
 import { Sqlite3JugglerConnector } from '../../..';
 import { Callback, DataSource, PromiseOrVoid } from 'loopback-datasource-juggler';
 

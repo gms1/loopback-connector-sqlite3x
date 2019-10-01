@@ -1,4 +1,6 @@
 import { SqlDatabaseSettings } from 'sqlite3orm';
+import { AnyObject } from 'loopback-datasource-juggler';
+import { Sqlite3PropertyOptions } from './sqlite3-options';
 
 export interface Sqlite3AllSettings {
   name: string;
@@ -45,6 +47,11 @@ export interface Sqlite3AllSettings {
    */
   // tslint:disable-next-line no-null-keyword
   propertyValueForNULL?: null;
+
+  /*
+   * default property options
+   */
+  propertyOptions?: { [modelName: string]: { [propName: string]: Sqlite3PropertyOptions } };
 }
 
 export type Sqlite3Settings = Partial<Sqlite3AllSettings>;

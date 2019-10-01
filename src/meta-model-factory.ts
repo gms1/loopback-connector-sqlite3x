@@ -8,10 +8,13 @@ import {
   MetaModel,
   PropertyType,
   TableOpts,
+  ValueTransformer,
 } from 'sqlite3orm';
 
 import { SQLITE3_CONNECTOR_NAME, Sqlite3Connector } from './sqlite3-connector';
 import { Sqlite3ModelOptions, Sqlite3PropertyOptions } from './sqlite3-options';
+import { Sqlite3Settings } from './sqlite3-settings';
+import { PropertyDefinition } from 'loopback-datasource-juggler';
 
 function debug(arg: any, ...args: any[]): void {
   Sqlite3Connector.debug(arg, ...args);
@@ -27,27 +30,25 @@ interface MetaModelRef {
  */
 
 export class MetaModelFactory {
-  /**
-   * The one and only MetaModelFactory instance
-   *
-   * @static
-   */
-  public static models: MetaModelFactory;
-
+  private readonly settings: Sqlite3Settings | undefined;
   private mapNameToMetaModel!: Map<string, MetaModelRef>;
+
+  // required in Sqlite3JugglerConnector.fromColumnValue and Sqlite3JugglerConnector.toColumnValue
+  private readonly mapPropDefToTransform!: WeakMap<any, ValueTransformer>;
 
   /**
    * Creates an instance of MetaModelFactory.
    *
    */
-  public constructor() {
-    if (!MetaModelFactory.models) {
-      this.mapNameToMetaModel = new Map<string, MetaModelRef>();
+  public constructor(settings?: Sqlite3Settings) {
+    this.settings = settings;
+    this.mapNameToMetaModel = new Map();
+    this.mapPropDefToTransform = new WeakMap();
+  }
 
-      // initialize the 'singleton'
-      MetaModelFactory.models = this;
-    }
-    return MetaModelFactory.models;
+  // required in Sqlite3JugglerConnector.fromColumnValue and Sqlite3JugglerConnector.toColumnValue
+  getValueTransformer(prop: PropertyDefinition): ValueTransformer | undefined {
+    return this.mapPropDefToTransform.get(prop);
   }
 
   /**
@@ -100,6 +101,7 @@ export class MetaModelFactory {
     const mapKeyToColName = new Map<string, string>();
     Object.keys(properties)
       .filter((propName) => properties.hasOwnProperty(propName))
+      // tslint:disable-next-line: cyclomatic-complexity
       .forEach((propName) => {
         const property = properties[propName];
 
@@ -108,8 +110,21 @@ export class MetaModelFactory {
           // or table has a combined id
           tableOpts.autoIncrement = true;
         }
-        const propertyOpts = (property[SQLITE3_CONNECTOR_NAME] || {}) as Sqlite3PropertyOptions;
-        property[SQLITE3_CONNECTOR_NAME] = propertyOpts;
+
+        let defaultPropertyOpts;
+        if (
+          this.settings &&
+          this.settings.propertyOptions &&
+          this.settings.propertyOptions[modelName]
+        ) {
+          defaultPropertyOpts = this.settings.propertyOptions[modelName][propName];
+        }
+
+        const propertyOpts = Object.assign(
+          {},
+          defaultPropertyOpts,
+          property[SQLITE3_CONNECTOR_NAME],
+        ) as Sqlite3PropertyOptions;
 
         const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
         if (
@@ -143,14 +158,13 @@ export class MetaModelFactory {
       });
     metaModelRef.metaModel.init(tableOpts);
 
-    Object.keys(properties).forEach((propName) => {
-      const property = properties[propName];
-      if (!property[SQLITE3_CONNECTOR_NAME] || property[SQLITE3_CONNECTOR_NAME].transform) {
-        return;
-      }
-      const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
-      property[SQLITE3_CONNECTOR_NAME].transform = metaProp.transform;
-    });
+    Object.keys(properties)
+      .filter((propName) => properties.hasOwnProperty(propName))
+      .forEach((propName) => {
+        const property = properties[propName];
+        const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
+        this.mapPropDefToTransform.set(property, metaProp.transform);
+      });
 
     // indexes:
     if (typeof settings.indexes === 'object') {

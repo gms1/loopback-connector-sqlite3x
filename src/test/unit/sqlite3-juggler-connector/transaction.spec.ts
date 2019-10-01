@@ -3,7 +3,7 @@
 import { SqlDatabase } from 'sqlite3orm';
 
 import { Transaction } from '../../../lc-import';
-import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init.spec';
 import { Sqlite3JugglerConnector } from '../../..';
 import { DataSource } from 'loopback-datasource-juggler';
 

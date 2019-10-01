@@ -3,7 +3,7 @@
 
 import * as should from 'should';
 
-import { getDefaultDataSource, getDefaultConnector } from '../core/test-init';
+import { getDefaultDataSource, getDefaultConnector } from '../core/test-init.spec';
 import { UpgradeMode } from 'sqlite3orm';
 import { DataSource } from 'loopback-datasource-juggler';
 import { Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';

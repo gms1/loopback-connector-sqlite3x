@@ -48,7 +48,7 @@ export class Sqlite3Connector implements Connector {
       SqlDatabase.verbose();
     }
     this.pool = new SqlConnectionPool();
-    this.metaModels = new MetaModelFactory();
+    this.metaModels = new MetaModelFactory(this.settings);
   }
 
   /* istanbul ignore next */
