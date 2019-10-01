@@ -201,7 +201,7 @@ export class MetaModelFactory {
           if (
             indexDef.options &&
             // tslint:disable-next-line triple-equals
-            typeof indexDef.options.unique != undefined
+            indexDef.options.unique != undefined
           ) {
             isUnique = !!indexDef.options.unique;
           }

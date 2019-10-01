@@ -1,5 +1,4 @@
 import { SqlDatabaseSettings } from 'sqlite3orm';
-import { AnyObject } from 'loopback-datasource-juggler';
 import { Sqlite3PropertyOptions } from './sqlite3-options';
 
 export interface Sqlite3AllSettings {

@@ -41,7 +41,6 @@ describe('DefaultCrudRepository + sqlite3x connector', () => {
   after(async () => {
     if (!connector) {
       throw new Error('NO CONNECTOR!!!');
-      return;
     }
     for (const modelName of connector.modelNames()) {
       await connector.dropTable(modelName);

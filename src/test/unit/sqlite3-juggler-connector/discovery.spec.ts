@@ -55,7 +55,6 @@ describe('sqlite3-juggler-connector: discover model', () => {
   before(async () => {
     ds = getDefaultDataSource();
     connector = getDefaultConnector();
-    db = ds as any;
     if (!ds.connected) {
       await ds.connect();
     }

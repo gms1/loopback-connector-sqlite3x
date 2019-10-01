@@ -177,7 +177,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
     options = options || {};
     let res: any[] | SqlRunResult;
     try {
-      const transaction = options && options.transaction;
+      const transaction = options.transaction;
       if (transaction && transaction.connection && transaction.connector === this) {
         res = await this.connector.runSQL(transaction.connection, sql, params);
       } else {
