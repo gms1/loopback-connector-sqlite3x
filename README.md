@@ -41,6 +41,28 @@ for loopback 4 please use:
 npm install loopback-connector-sqlite3x --save
 ```
 
+```shell
+lb4 datasource test
+? Select the connector for test: other
+? Enter the connectors package name: loopback-connector-sqlite3x
+   create src/datasources/test.datasource.json
+   create src/datasources/test.datasource.ts
+   update src/datasources/index.ts
+
+Datasource Test was created in src/datasources/
+```
+
+adjust src/datasources/test.datasource.json:
+
+```json
+{
+  "name": "test",
+  "connector": "loopback-connector-sqlite3x",
+  "file": "test.db",
+  "poolMin": 2
+}
+```
+
 ## Connector settings
 
 ```TypeScript
