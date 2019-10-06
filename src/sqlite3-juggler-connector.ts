@@ -17,6 +17,7 @@ import {
   Table,
   UpgradeInfo,
   sequentialize,
+  PromiseFactories,
 } from 'sqlite3orm';
 
 import { ParameterizedSQL, SQLConnector } from './lc-import';
@@ -311,13 +312,17 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
    */
   createTable(model: string, cb?: Callback): PromiseOrVoid {
     const fn = async (): Promise<void> => {
-      try {
-        const metaModel = this.getMetaModel(model, true);
-        await this.promisifiedExecuteSql(metaModel.table.getCreateTableStatement());
-      } catch (err /* istanbul ignore next */) {
-        return Promise.reject(err);
-      }
-      return;
+      const metaModel = this.getMetaModel(model, true);
+      const conn = await this.connector.getConnection();
+      const factories: PromiseFactories<any[] | SqlRunResult> = [];
+      factories.push(() => this.connector.runSQL(conn, metaModel.table.getCreateTableStatement()));
+      metaModel.table.mapNameToIDXDef.forEach((idx) => {
+        factories.push(() =>
+          this.connector.runSQL(conn, metaModel.table.getCreateIndexStatement(idx.name)),
+        );
+      });
+      await sequentialize(factories);
+      await conn.close();
     };
     return callbackifyOrPromise(fn(), cb);
   }
