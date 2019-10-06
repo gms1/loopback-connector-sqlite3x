@@ -179,13 +179,14 @@ export interface SqlDatabaseSettings {
 You can use the 'sqlite3x' property to specify additional database-specific options for a LoopBack model (see Sqlite3ModelOptions).
 
 ```TypeScript
-{
-    name: 'TestModel',
-    options:
-        {
-          sqlite3x: {tableName: 'TEST_MODEL'}
-        },
-
+@model({
+  settings: {
+    sqlite3x: {
+      tableName: 'MyTableName',
+      withoutRowId: true // default: false
+    },
+  },
+})
 ```
 
 ### properties
@@ -193,19 +194,16 @@ You can use the 'sqlite3x' property to specify additional database-specific opti
 You can use the 'sqlite3x' property to specify additional database-specific options for a LoopBack property (see Sqlite3PropertyOptions).
 
 ```TypeScript
-{
-    name: 'TestModel',
-    properties: {
-      id: {
-        type: 'Number',
-        id: 1,
-        sqlite3x: {columnName: 'ID', dbtype: 'INTEGER NOT NULL'}
-      },
-      created: {
-        type: 'Date'
-        sqlite3x: {columnName 'CREATED'}
-      }
-
+  @property({
+    type: 'date',
+    required: true,
+    sqlite3x: {
+      columnName: 'MyColumnName',
+      dbtype: 'INTEGER NOT NULL',
+      dateInMilliSeconds: false // default: true
+    }
+  })
+  myPropertyName: Date;
 ```
 
 #### default type mapping
@@ -222,7 +220,31 @@ You can use the 'sqlite3x' property to specify additional database-specific opti
 
 you can define indexes using the loopback 'indexes' property in the standard or shortened form, as well as using the MySql form
 
-<!-- -->
+```TypeScript
+@model({
+  settings: {
+    indexes: {
+      myIndex1: {  // MySql form
+        columns: 'col1,col2',
+        kind: 'unique'
+      },
+      myIndex2: { // standard form
+        keys: {
+          col1: 1, // ascending
+          col2: -1, //descending
+        },
+        options: {
+          unique: true,
+        }
+      },
+      myIndex3: { // shortened form
+        col1: 1, // ascending
+        col2: -1, //descending
+      }
+    }
+  },
+})
+```
 
 > NOTE: specifying indexes at the model property level is not supported
 
