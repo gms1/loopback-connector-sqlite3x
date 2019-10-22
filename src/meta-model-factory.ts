@@ -151,7 +151,9 @@ export class MetaModelFactory {
           dateInMilliSeconds: propertyOpts.dateInMilliSeconds,
           transform: propertyOpts.transform,
         };
-
+        if (property.required) {
+          fieldOpts.notNull = true;
+        }
         metaModelRef!.metaModel.setPropertyField(propName, !!property.id, fieldOpts);
         mapKeyToColName.set(propName, fieldOpts.name as string);
       });
