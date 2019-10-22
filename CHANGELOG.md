@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.12
+
+- feature: support for `required` property in PropertyDefinition
+
 ## 2.0.1-2.0.11
 
 - maintenance release for lb4 support
