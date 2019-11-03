@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.13
+
+- maintenance release
+
 ## 2.0.12
 
 - feature: support for `required` property in PropertyDefinition
