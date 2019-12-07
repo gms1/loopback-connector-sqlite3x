@@ -22,11 +22,6 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 - connection pool
 - all other features provided by [sqlite3orm](https://github.com/gms1/node-sqlite3-orm)
 
-### TODO
-
-- improve test coverage
-- LB4 support: better sqlite3orm integration: share/sync model definitions for entities
-
 ## Installation
 
 for loopback 3 it is recommended to use:
