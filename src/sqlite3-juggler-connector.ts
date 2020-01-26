@@ -235,7 +235,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
       return transform.toDB(value);
     }
     /* istanbul ignore next */
-    throw new Error(`something happened calling toColumnValue`);
+    return value;
   }
 
   // *************************************************************************************
