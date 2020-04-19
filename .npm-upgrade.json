@@ -1,12 +1,8 @@
 {
   "ignore": {
-    "loopback-datasource-juggler": {
-      "versions": ">=4.0",
-      "reason": "this branch is for lb3 only"
-    },
-    "loopback-connector": {
-      "versions": ">=5.0",
-      "reason": "this branch is for lb3 only"
+    "prettier": {
+      "versions": ">= 2.0",
+      "reason": ""
     }
   }
 }
