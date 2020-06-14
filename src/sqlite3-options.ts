@@ -12,7 +12,7 @@ export interface Sqlite3ExecuteOptions {
 
 export interface Sqlite3ModelOptions {
   tableName?: string;
-  // autoIncement?: boolean; => using prop.id && prop.generated
+  explicitAutoIncrement?: boolean; // default depends on Sqlite3Settings.implicitAutoincrementByDefault
   withoutRowId?: boolean; // defaults to false
 }
 export interface Sqlite3PropertyOptions {

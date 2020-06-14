@@ -107,7 +107,14 @@ export class MetaModelFactory {
         if (property.id && property.generated) {
           // may be set to false later on, if the type for this property is not integer
           // or table has a combined id
-          tableOpts.autoIncrement = true;
+          // tslint:disable-next-line: triple-equals
+          if (modelOpts.explicitAutoIncrement != undefined) {
+            tableOpts.autoIncrement = modelOpts.explicitAutoIncrement
+              ? modelOpts.explicitAutoIncrement
+              : undefined;
+          } else if (!this.settings?.implicitAutoincrementByDefault) {
+            tableOpts.autoIncrement = true;
+          }
         }
 
         let defaultPropertyOpts;

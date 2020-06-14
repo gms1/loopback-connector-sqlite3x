@@ -31,6 +31,7 @@ describe('sqlite3-juggler-connector: meta model', () => {
       await connector.dropTable(modelName);
     }
     connector.destroyAllMetaModels();
+    delete connector.settings.implicitAutoincrementByDefault;
   });
 
   // ==============================================================================
@@ -283,7 +284,7 @@ describe('sqlite3-juggler-connector: meta model', () => {
   });
 
   // ==============================================================================
-  it('autoIncrement from generated', async () => {
+  it('explicit autoIncrement from generated', async () => {
     const testSchema = {
       name: 'TestModel',
       options: {
@@ -300,6 +301,104 @@ describe('sqlite3-juggler-connector: meta model', () => {
       },
     };
 
+    delete connector.settings.implicitAutoincrementByDefault;
+    const models: any = db.modelBuilder.buildModels([testSchema]);
+    const testModel: any = models[testSchema.name];
+    testModel.attachTo(db);
+    try {
+      await ds.automigrate(testSchema.name);
+    } catch (err) {
+      should.not.exists(err);
+    }
+    const metaModel = connector.getMetaModel(testSchema.name);
+    const table = metaModel.table;
+    table.isAutoIncrementDefined.should.be.true();
+  });
+
+  // ==============================================================================
+  it('implicit autoIncrement from generated', async () => {
+    const testSchema = {
+      name: 'TestModel',
+      options: {
+        idInjection: false,
+        sqlite3x: { tableName: 'TEST_TABLE' },
+      },
+      properties: {
+        id: {
+          type: 'Number',
+          id: 1,
+          generated: 1,
+          sqlite3x: { columnName: 'IDC', dbtype: 'INTEGER NOT NULL' },
+        },
+      },
+    };
+
+    connector.settings.implicitAutoincrementByDefault = true;
+    const models: any = db.modelBuilder.buildModels([testSchema]);
+    const testModel: any = models[testSchema.name];
+    testModel.attachTo(db);
+    try {
+      await ds.automigrate(testSchema.name);
+    } catch (err) {
+      should.not.exists(err);
+    }
+    const metaModel = connector.getMetaModel(testSchema.name);
+    const table = metaModel.table;
+    table.isAutoIncrementDefined.should.be.false();
+  });
+
+  // ==============================================================================
+  it('implicit autoIncrement from Sqlite3ModelOptions', async () => {
+    const testSchema = {
+      name: 'TestModel',
+      options: {
+        idInjection: false,
+        sqlite3x: { tableName: 'TEST_TABLE', explicitAutoIncrement: false },
+      },
+      properties: {
+        id: {
+          type: 'Number',
+          id: 1,
+          generated: 1,
+          sqlite3x: { columnName: 'IDC', dbtype: 'INTEGER NOT NULL' },
+        },
+      },
+    };
+
+    connector.settings.implicitAutoincrementByDefault = false;
+    const models: any = db.modelBuilder.buildModels([testSchema]);
+    const testModel: any = models[testSchema.name];
+    testModel.attachTo(db);
+    try {
+      await ds.automigrate(testSchema.name);
+    } catch (err) {
+      should.not.exists(err);
+    }
+    const metaModel = connector.getMetaModel(testSchema.name);
+    const table = metaModel.table;
+    table.name.should.be.equal('TEST_TABLE');
+    table.isAutoIncrementDefined.should.be.false();
+  });
+
+  // ==============================================================================
+  it('explicit autoIncrement from Sqlite3ModelOptions', async () => {
+    const testSchema = {
+      name: 'TestModel',
+      options: {
+        idInjection: false,
+        sqlite3x: { tableName: 'TEST_TABLE', explicitAutoIncrement: true },
+      },
+      properties: {
+        id: {
+          type: 'Number',
+          id: 1,
+          generated: 1,
+          sqlite3x: { columnName: 'IDC', dbtype: 'INTEGER NOT NULL' },
+        },
+      },
+    };
+
+    connector.settings.implicitAutoincrementByDefault = true;
     const models: any = db.modelBuilder.buildModels([testSchema]);
     const testModel: any = models[testSchema.name];
     testModel.attachTo(db);

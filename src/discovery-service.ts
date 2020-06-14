@@ -124,10 +124,7 @@ export class DiscoveryService {
       if (!tableInfo) {
         return Promise.reject(`table ${schemaName}.${tableName} not found`);
       }
-      const autoId =
-        tableInfo.autoIncrement && tableInfo.primaryKey.length === 1
-          ? tableInfo.primaryKey[0]
-          : undefined;
+      const idColumn = tableInfo.primaryKey.length === 1 ? tableInfo.primaryKey[0] : undefined;
 
       const pkCols: { [key: string]: number } = {};
       let keySeq = 1;
@@ -163,7 +160,7 @@ export class DiscoveryService {
         };
         if (pkCols[colName]) {
           schema.properties[propName].id = 1;
-          if (colName === autoId) {
+          if (colName === idColumn && colInfo.typeAffinity === 'INTEGER') {
             schema.properties[propName].generated = 1;
           }
         }
