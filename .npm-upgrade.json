@@ -3,6 +3,10 @@
     "prettier": {
       "versions": ">= 2.0",
       "reason": ""
+    },
+    "mocha": {
+      "versions": ">=8.0.0",
+      "reason": "no support for node 8"
     }
   }
 }
