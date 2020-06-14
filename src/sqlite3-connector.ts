@@ -280,6 +280,7 @@ export class Sqlite3Connector implements Connector {
       connectorSettings.dbSettings.executionMode = 'PARALLELIZE';
     }
 
+    console.log(`propertyValueForNULL: ${connectorSettings.propertyValueForNULL}`);
     return connectorSettings as Sqlite3AllSettings;
   }
 }

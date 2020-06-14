@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.1.0
+
+- feature: support for implicit autoincrement using ROWID (vs explicit use of AUTOINCREMENT keyword)
+  [AUTOINCREMENT](https://www.sqlite.org/autoinc.html)
+  see Sqlite3Settings.implicitAutoincrementByDefault and Sqlite3ModelOptions.explicitAutoIncrement
+
 ## 2.0.14 - 2.0.16
 
 - maintenance release
