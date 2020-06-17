@@ -10,8 +10,7 @@ coverage:
 	npm run coverage:html
 
 coveralls:
-	@echo nodejs=$(NODE_VERSION)
-	@if [ "$(NODE_VERSION)" -eq 8 ]; then npm run coverage:coveralls; fi
+	npm run coverage:coveralls
 
 test:
 	npm run clean
