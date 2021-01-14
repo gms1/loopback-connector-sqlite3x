@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.1
+
+- maintenance release
+  
 ## 2.1.0
 
 - feature: support for implicit autoincrement using ROWID (vs explicit use of AUTOINCREMENT keyword)

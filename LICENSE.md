@@ -1,5 +1,5 @@
 
-Copyright (c) 2018-2020 Guenter Sandner
+Copyright (c) 2018-2021 Guenter Sandner
 
 This project is licensed under the Artistic License 2.0, full text below.
 

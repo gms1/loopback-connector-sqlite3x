@@ -42,8 +42,10 @@ describe('DefaultCrudRepository + sqlite3x connector', () => {
     if (!connector) {
       throw new Error('NO CONNECTOR!!!');
     }
-    for (const modelName of connector.modelNames()) {
-      await connector.dropTable(modelName);
+    if (connector.pool.isOpen()) {
+      for (const modelName of connector.modelNames()) {
+        await connector.dropTable(modelName);
+      }
     }
     connector.destroyAllMetaModels();
   });
