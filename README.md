@@ -12,6 +12,7 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 [![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
 [![Known Vulnerabilities](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x/badge.svg)](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x)
 
+![NPM](https://img.shields.io/npm/l/loopback-connector-sqlite3x)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 ## Features
