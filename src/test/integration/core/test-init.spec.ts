@@ -1,4 +1,3 @@
-// tslint:disable no-implicit-dependencies no-require-imports
 import { DataSource } from 'loopback-datasource-juggler';
 import { initialize, Sqlite3JugglerConnector } from '../../../sqlite3-juggler-connector';
 

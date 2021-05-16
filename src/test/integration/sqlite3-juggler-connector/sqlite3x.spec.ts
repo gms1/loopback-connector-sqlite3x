@@ -1,6 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies
-// tslint:disable variable-name no-null-keyword
-// tslint:disable await-promise
 import * as should from 'should';
 import * as sinon from 'sinon';
 

@@ -44,7 +44,6 @@ export interface Sqlite3AllSettings {
   /*
    * [propertyValueForNULL] - the property value if column value is NULL
    */
-  // tslint:disable-next-line no-null-keyword
   propertyValueForNULL?: any;
 
   /*

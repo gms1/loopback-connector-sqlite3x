@@ -1,5 +1,4 @@
 import { SqlDatabase, ValueTransformer } from 'sqlite3orm';
-// tslint:disable-next-line no-unnecessary-class
 declare class Sqlite3Connector {}
 
 export interface Sqlite3TransactionOptions {

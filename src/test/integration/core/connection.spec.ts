@@ -1,5 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies
-// tslint:disable await-promise
 import * as should from 'should';
 
 import { SQL_OPEN_READWRITE, SQL_MEMORY_DB_SHARED } from '../../..';
@@ -64,7 +62,6 @@ describe('core: connections', () => {
     // first connection should work
     const ver0 = await sqldb1.getUserVersion();
 
-    // tslint:disable-next-line restrict-plus-operands  ??????????????
     const ver1 = ver0 + 42;
     await sqldb1.setUserVersion(ver1);
 

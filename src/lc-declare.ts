@@ -1,5 +1,3 @@
-// tslint:disable
-
 // from loopback-connector/index.js:
 //   exports.Connector = require('./lib/connector');
 //   Set up SqlConnector as an alias to SQLConnector

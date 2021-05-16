@@ -1,5 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies
-
 import { camelCase, CamelCase } from '../../../utils/string-utils';
 import should = require('should');
 

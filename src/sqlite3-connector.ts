@@ -1,4 +1,3 @@
-// tslint:disable no-require-imports member-ordering no-implicit-dependencies
 import { Connector } from '@loopback/repository';
 import _sg = require('strong-globalize');
 import * as _dbg from 'debug';
@@ -258,7 +257,6 @@ export class Sqlite3Connector implements Connector {
     connectorSettings.file = connectorSettings.file || SQL_MEMORY_DB_SHARED;
     connectorSettings.mode = connectorSettings.mode || SQL_OPEN_DEFAULT;
     connectorSettings.poolMin = connectorSettings.poolMin || 1;
-    // tslint:disable triple-equals
     connectorSettings.poolMax =
       connectorSettings.poolMax == undefined ? 0 : connectorSettings.poolMax;
     connectorSettings.schemaName = connectorSettings.schemaName || 'main';

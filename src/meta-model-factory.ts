@@ -1,5 +1,3 @@
-// tslint:disable no-non-null-assertion
-// import {ModelDefinition} from '@loopback/repository';
 import * as juggler from 'loopback-datasource-juggler';
 import {
   FieldOpts,
@@ -99,15 +97,13 @@ export class MetaModelFactory {
     const properties = lbModelDef.properties || {};
     const mapKeyToColName = new Map<string, string>();
     Object.keys(properties)
-      .filter((propName) => properties.hasOwnProperty(propName))
-      // tslint:disable-next-line: cyclomatic-complexity
+      .filter((propName) => Object.prototype.hasOwnProperty.call(properties, propName))
       .forEach((propName) => {
         const property = properties[propName];
 
         if (property.id && property.generated) {
           // may be set to false later on, if the type for this property is not integer
           // or table has a combined id
-          // tslint:disable-next-line: triple-equals
           if (modelOpts.explicitAutoIncrement != undefined) {
             tableOpts.autoIncrement = modelOpts.explicitAutoIncrement
               ? modelOpts.explicitAutoIncrement
@@ -132,6 +128,7 @@ export class MetaModelFactory {
           property[SQLITE3_CONNECTOR_NAME],
         ) as Sqlite3PropertyOptions;
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
         if (
           property.type &&
@@ -145,7 +142,6 @@ export class MetaModelFactory {
         }
         if (
           metaProp.propertyType === PropertyType.DATE &&
-          // tslint:disable-next-line triple-equals
           propertyOpts.dateInMilliSeconds == undefined
         ) {
           propertyOpts.dateInMilliSeconds = true;
@@ -161,15 +157,17 @@ export class MetaModelFactory {
         if (property.required) {
           fieldOpts.notNull = true;
         }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         metaModelRef!.metaModel.setPropertyField(propName, !!property.id, fieldOpts);
         mapKeyToColName.set(propName, fieldOpts.name as string);
       });
     metaModelRef.metaModel.init(tableOpts);
 
     Object.keys(properties)
-      .filter((propName) => properties.hasOwnProperty(propName))
+      .filter((propName) => Object.prototype.hasOwnProperty.call(properties, propName))
       .forEach((propName) => {
         const property = properties[propName];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const metaProp = metaModelRef!.metaModel.getOrAddProperty(propName);
         this.mapPropDefToTransform.set(property, metaProp.transform);
       });
@@ -191,7 +189,7 @@ export class MetaModelFactory {
     const metaModel = metaModelRef.metaModel;
     const table = metaModel.table;
     Object.keys(indexes)
-      .filter((indexName) => indexes.hasOwnProperty(indexName))
+      .filter((indexName) => Object.prototype.hasOwnProperty.call(indexes, indexName))
       .forEach((indexName) => {
         const indexDef = indexes[indexName];
         if (typeof indexDef.columns === 'string') {
@@ -205,13 +203,8 @@ export class MetaModelFactory {
         } else {
           // standard or shortened form:
           const keys = typeof indexDef.keys === 'object' ? indexDef.keys : indexDef;
-          // tslint:disable-next-line no-unnecessary-initializer
           let isUnique = undefined;
-          if (
-            indexDef.options &&
-            // tslint:disable-next-line triple-equals
-            indexDef.options.unique != undefined
-          ) {
+          if (indexDef.options && indexDef.options.unique != undefined) {
             isUnique = !!indexDef.options.unique;
           }
           const idxDef = new IDXDefinition(indexName, isUnique);
@@ -237,7 +230,7 @@ export class MetaModelFactory {
     const metaModel = metaModelRef.metaModel;
     const table = metaModel.table;
     Object.keys(foreignKeys)
-      .filter((constraintName) => foreignKeys.hasOwnProperty(constraintName))
+      .filter((constraintName) => Object.prototype.hasOwnProperty.call(foreignKeys, constraintName))
       .forEach((constraintName) => {
         const properties: string[] = foreignKeys[constraintName].properties.split(',');
         const refColumns: string[] = foreignKeys[constraintName].refColumns.split(',');

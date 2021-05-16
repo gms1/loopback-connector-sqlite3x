@@ -1,4 +1,3 @@
-// tslint:disable no-require-imports
 import sg = require('strong-globalize');
 sg.SetRootDir(__dirname);
 

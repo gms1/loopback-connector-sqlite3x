@@ -1,5 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies
-// tslint:disable await-promise
 import { SqlDatabase } from 'sqlite3orm';
 
 import { Transaction } from '../../../lc-import';
@@ -127,10 +125,9 @@ describe('sqlite3-juggler-connector: transaction', () => {
 
   it('basic transaction', async () => {
     const conn = await connector.beginTransaction();
-    let rows: any[];
 
     await conn.run("INSERT INTO TEST (id, col) values (1, 'commit test')");
-    rows = await conn.all('SELECT id, col FROM TEST ORDER BY id');
+    const rows = await conn.all('SELECT id, col FROM TEST ORDER BY id');
     rows.length.should.be.equal(1);
     await connector.rollback(conn);
   });

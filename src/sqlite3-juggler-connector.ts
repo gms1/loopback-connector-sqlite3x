@@ -1,5 +1,3 @@
-// tslint:disable no-implicit-dependencies no-string-literal
-
 import {
   Callback,
   DataSource,
@@ -261,7 +259,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
     if (!dbName) {
       return dbName;
     }
-    return '`' + dbName.replace(/\`/g, '``').replace(/\./, '`.`') + '`';
+    return '`' + dbName.replace(/`/g, '``').replace(/\./, '`.`') + '`';
   }
 
   /**
@@ -563,7 +561,7 @@ export class Sqlite3JugglerConnector extends SQLConnector implements Transaction
           : fk.refTable;
         let fkKey = fkModelName;
         let fkLastId = 0;
-        // tslint:disable-next-line no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         while (schema.options.relations![fkKey]) {
           fkKey = `${fkModelName}${++fkLastId}`;
         }

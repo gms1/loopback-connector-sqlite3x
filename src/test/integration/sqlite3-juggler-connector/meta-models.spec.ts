@@ -1,5 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies
-// tslint:disable await-promise
 import * as should from 'should';
 
 // todo: test index definitions using standard, shortened and MySql form

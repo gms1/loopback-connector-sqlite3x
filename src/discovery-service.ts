@@ -171,7 +171,7 @@ export class DiscoveryService {
       Object.keys(tableInfo.foreignKeys).forEach((fkName) => {
         const fkInfo = tableInfo.foreignKeys[fkName];
         const props = fkInfo.columns.map((colName) => cols[colName]);
-        // tslint:disable no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         schema.options.foreignKeys![fkName] = {
           properties: props.join(','),
           refTable: fkInfo.refTable,

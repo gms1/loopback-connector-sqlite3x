@@ -1,6 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies no-var-requires
-// tslint:disable await-promise
-
 import * as should from 'should';
 
 import { Sqlite3JugglerConnector } from '../../..';
@@ -15,7 +12,6 @@ describe('sqlite3-juggler-connector: juggler imported tests', () => {
     //  .) relations/embedsOne/should get an embedded item on scope with promises - verify
     //  .) relations/embedsOne/should delete the embedded document and also update parent
 
-    // tslint:disable-next-line no-null-keyword
     initJugglerDataSource({ propertyValueForNULL: null });
 
     const ds = (global as any).getSchema();

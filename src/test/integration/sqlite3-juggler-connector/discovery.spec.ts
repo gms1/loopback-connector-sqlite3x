@@ -1,7 +1,3 @@
-// tslint:disable no-require-imports no-implicit-dependencies no-var-requires
-// tslint:disable await-promise no-non-null-assertion no-string-literal
-// tslint:disable no-unused-variable
-
 import * as should from 'should';
 
 import { getDefaultDataSource, getDefaultConnector } from '../core/test-init.spec';
