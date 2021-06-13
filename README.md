@@ -7,7 +7,6 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 
 [![npm version](https://badge.fury.io/js/loopback-connector-sqlite3x.svg)](https://badge.fury.io/js/loopback-connector-sqlite3x)
 [![Build Status](https://api.travis-ci.com/gms1/loopback-connector-sqlite3x.svg?branch=master)](https://travis-ci.com/gms1/loopback-connector-sqlite3x)
-[![Coverage Status](https://coveralls.io/repos/github/gms1/loopback-connector-sqlite3x/badge.svg?branch=master&service=github)](https://coveralls.io/github/gms1/loopback-connector-sqlite3x?branch=master)
 [![Coverage Status](https://codecov.io/gh/gms1/loopback-connector-sqlite3x/branch/master/graph/badge.svg)](https://codecov.io/gh/gms1/loopback-connector-sqlite3x)
 
 [![DeepScan grade](https://deepscan.io/api/teams/439/projects/7419/branches/74732/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=439&pid=7419&bid=74732)
