@@ -1,6 +1,6 @@
 {
   "name": "loopback-connector-sqlite3x",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "alternative LoopBack connector for SQLite3",
   "main": "./index.js",
   "types": "./index.d.ts",
