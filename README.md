@@ -11,7 +11,6 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 
 [![DeepScan grade](https://deepscan.io/api/teams/439/projects/7419/branches/74732/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=439&pid=7419&bid=74732)
 [![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
-[![Known Vulnerabilities](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x/badge.svg)](https://snyk.io/test/github/gms1/loopback-connector-sqlite3x)
 
 ![NPM](https://img.shields.io/npm/l/loopback-connector-sqlite3x)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
