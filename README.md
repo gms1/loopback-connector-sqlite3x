@@ -6,7 +6,8 @@ Unlike the official, this module provides full support for e.g auto-migrate, aut
 (please see [Features](#features))
 
 [![npm version](https://badge.fury.io/js/loopback-connector-sqlite3x.svg)](https://badge.fury.io/js/loopback-connector-sqlite3x)
-[![Build Status](https://api.travis-ci.com/gms1/loopback-connector-sqlite3x.svg?branch=master)](https://travis-ci.com/gms1/loopback-connector-sqlite3x)
+[![Build Status](https://github.com/gms1/loopback-connector-sqlite3x/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/gms1/loopback-connector-sqlite3x/actions/workflows/build.yml)
+
 [![Coverage Status](https://codecov.io/gh/gms1/loopback-connector-sqlite3x/branch/master/graph/badge.svg)](https://codecov.io/gh/gms1/loopback-connector-sqlite3x)
 
 [![DeepScan grade](https://deepscan.io/api/teams/439/projects/7419/branches/74732/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=439&pid=7419&bid=74732)
@@ -117,7 +118,7 @@ export interface Sqlite3AllSettings {
  * additional database settings
  *
  *  for a description of the pragma setting see: https://www.sqlite.org/pragma.html
- *  for a description of the execution mode see: https://github.com/mapbox/node-sqlite3/wiki/Control-Flow
+ *  for a description of the execution mode see: https://github.com/TryGhost/node-sqlite3/wiki/Control-Flow
  *
  * defaults:
  *   journalMode 'WAL'

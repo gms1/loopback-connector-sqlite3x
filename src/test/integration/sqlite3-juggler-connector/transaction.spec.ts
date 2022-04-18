@@ -1,3 +1,4 @@
+import * as should from 'should';
 import { SqlDatabase } from 'sqlite3orm';
 
 import { Transaction } from '../../../lc-import';
@@ -25,7 +26,7 @@ describe('sqlite3-juggler-connector: transaction', () => {
     try {
       await connection.run('DELETE FROM TEST');
     } catch (err) {
-      err.should.fail();
+      should.should.fail();
     }
   });
 
@@ -96,7 +97,7 @@ describe('sqlite3-juggler-connector: transaction', () => {
       rows = await connection.all('SELECT id, col FROM TEST ORDER BY id');
       rows.length.should.be.equal(1);
     } catch (err) {
-      err.should.fail();
+      should.should.fail();
     }
   });
 

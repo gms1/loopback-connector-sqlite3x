@@ -213,7 +213,7 @@ export class Sqlite3Connector implements Connector {
     try {
       let res: any[] | SqlRunResult;
       const sqlType = sql
-        .trimLeft()
+        .trimStart()
         .substring(0, 6)
         .toUpperCase();
       if (sqlType === 'SELECT' || sqlType === 'PRAGMA') {

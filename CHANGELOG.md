@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.4
+
+- upgrade node-sqlite3 5.0.3 [TryGhost](https://github.com/TryGhost/node-sqlite3)
+
 ## 2.1.1 - 2.1.3
 
 - maintenance release
