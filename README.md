@@ -5,15 +5,12 @@ The advanced but unofficial SQLite3 Connector Module for the LoopBack Framework.
 Unlike the official, this module provides full support for e.g auto-migrate, auto-upgrade and model discovery.
 (please see [Features](#features))
 
-[![npm version](https://badge.fury.io/js/loopback-connector-sqlite3x.svg)](https://badge.fury.io/js/loopback-connector-sqlite3x)
+![Version](https://img.shields.io/npm/v/loopback-connector-sqlite3x)
 [![Build Status](https://github.com/gms1/loopback-connector-sqlite3x/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/gms1/loopback-connector-sqlite3x/actions/workflows/build.yml)
-
 [![Coverage Status](https://codecov.io/gh/gms1/loopback-connector-sqlite3x/branch/master/graph/badge.svg)](https://codecov.io/gh/gms1/loopback-connector-sqlite3x)
-
 [![DeepScan grade](https://deepscan.io/api/teams/439/projects/7419/branches/74732/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=439&pid=7419&bid=74732)
-[![Dependency Status](https://david-dm.org/gms1/loopback-connector-sqlite3x.svg)](https://david-dm.org/gms1/loopback-connector-sqlite3x)
 
-![NPM](https://img.shields.io/npm/l/loopback-connector-sqlite3x)
+![License](https://img.shields.io/npm/l/loopback-connector-sqlite3x)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 ## Features

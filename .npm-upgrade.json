@@ -3,6 +3,10 @@
     "prettier": {
       "versions": ">= 2.0",
       "reason": ""
+    },
+    "@loopback/repository-tests": {
+      "versions": ">=0.21",
+      "reason": "contains breaking changes"
     }
   }
 }
